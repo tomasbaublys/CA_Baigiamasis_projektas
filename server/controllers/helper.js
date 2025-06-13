@@ -4,4 +4,20 @@ const DB_CONNECTION_STRING = `mongodb+srv://${process.env.DB_USER}:${process.env
 
 export const connectDB = async () => {
   return await MongoClient.connect(DB_CONNECTION_STRING);
-}
+};
+
+export const generateAccessToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: "2h"});
+};
+
+export const generateRefreshToken = (payload) => {
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET, { expiresIn: "2d" });
+};
+
+export const verifyAccessToken = (token) => {
+  return jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+};
+
+export const verifyRefreshToken = (token) => {
+  return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+};
