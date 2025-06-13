@@ -11,7 +11,7 @@ export const authenticateToken = (req, res, next) => {
 
   try {
     const decoded = verifyAccessToken(token);
-    req.user = decoded; // Attach decoded user info to request
+    req.user = decoded;
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
