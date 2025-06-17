@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt';
-import { connectDB, generateAccessToken } from './helper.js';
+import { v4 as generateID } from 'uuid';
+import { connectDB, generateAccessToken, verifyRefreshToken } from './helper.js';
 
 const login = async (req, res) => {
   const client = await connectDB();
@@ -50,14 +51,50 @@ const loginAuto = (req, res) => {
   });
 };
 
+const refreshToken = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).send({ error: 'Refresh token is required.' });
+  }
+
+  try {
+    const decoded = verifyRefreshToken(token);
+    const { email, username } = decoded;
+
+    const newAccessToken = generateAccessToken({ email, username });
+
+    res.header('Authorization', newAccessToken).send({
+      success: 'Access token refreshed successfully.',
+      accessToken: newAccessToken,
+    });
+  } catch (err) {
+    console.error('Refresh token error:', err.message);
+
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).send({ error: 'Refresh token expired. Please log in again.' });
+    }
+
+    res.status(403).send({ error: 'Invalid refresh token.' });
+  }
+};
+
 const register = async (req, res) => {
   const client = await connectDB();
 
   try {
-    const { email, username, password } = req.body;
+    const { email, username, password, profilePicture } = req.body;
 
     if (!email || !username || !password) {
       return res.status(400).send({ error: 'Email, username, and password are required.' });
+    }
+
+    const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordPattern.test(password)) {
+      return res.status(400).send({
+        error:
+          'Password must be at least 8 characters long, include uppercase and lowercase letters, a number, and a special character.',
+      });
     }
 
     const DB_RESPONSE = await client.db('Forum').collection('users').findOne({
@@ -77,9 +114,11 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     const newUser = {
+      _id: generateID(),
       email,
       username,
       password: hashedPassword,
+      profilePicture: profilePicture || '',
       createdAt: new Date().toISOString()
     };
 
@@ -100,4 +139,4 @@ const register = async (req, res) => {
   }
 };
 
-export { login, loginAuto, register };
+export { login, loginAuto, refreshToken, register };
