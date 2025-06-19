@@ -6,8 +6,8 @@ import { UsersProvider } from './components/contexts/UsersContext.tsx';
 
 createRoot(document.getElementById('root') as HTMLDivElement).render(
   <UsersProvider>
-    <BrowserRouter>
-      <App />
-    </BrowserRouter>
+  <BrowserRouter>
+    <App />
+  </BrowserRouter>
   </UsersProvider>
 );

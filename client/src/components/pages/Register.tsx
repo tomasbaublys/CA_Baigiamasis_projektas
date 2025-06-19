@@ -128,24 +128,37 @@ const Register = () => {
 
   const validationSchema = Yup.object({
     email: Yup.string()
-      .email('Invalid email format.')
-      .required('Required.'),
+      .email('Please enter a valid email address.')
+      .required('Email is required.')
+      .trim(),
+
     username: Yup.string()
-      .min(3, 'Minimum 3 characters.')
-      .max(20, 'Maximum 20 characters.')
-      .required('Required.'),
+      .min(4, 'Username must be at least 4 characters.')
+      .max(20, 'Username must be at most 20 characters.')
+      .matches(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores.')
+      .required('Username is required.')
+      .trim(),
+
     password: Yup.string()
-      .matches(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,}$/,
-        'Password must contain uppercase, lowercase, number, and special character.'
-      )
-      .required('Required.'),
+      .required('Password is required.')
+      .min(8, 'Password must be at least 8 characters.')
+      .max(25, 'Password must be at most 25 characters.')
+      .matches(/[A-Z]/, 'Must include at least one uppercase letter.')
+      .matches(/[a-z]/, 'Must include at least one lowercase letter.')
+      .matches(/[0-9]/, 'Must include at least one number.')
+      .matches(/[@$!%*?&]/, 'Must include at least one special character.')
+      .trim(),
+
     passwordConfirm: Yup.string()
+      .required('Please confirm your password.')
       .oneOf([Yup.ref('password')], 'Passwords must match.')
-      .required('Required.'),
+      .trim(),
+
     profilePicture: Yup.string()
-      .url('Must be a valid URL.')
-      .nullable()
+      .url('Must be a valid image URL.')
+      .matches(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i, 'Must be a valid image URL (jpg, png, etc).')
+      .notRequired()
+      .trim()
   });
 
   const formik = useFormik({
@@ -160,7 +173,7 @@ const Register = () => {
         return;
       }
       setRegisterMessage(response.success);
-      setTimeout(() => navigate('/'), 2000);
+      setTimeout(() => navigate('/'), 1800);
     }
   });
 

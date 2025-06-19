@@ -1,11 +1,9 @@
 import { ReactElement } from 'react';
 
-// Generic children prop
 export type ChildrenProp = {
   children: ReactElement;
 };
 
-// User type (used across context, auth, forms)
 export type User = {
   _id: string;
   email: string;
@@ -15,13 +13,12 @@ export type User = {
   createdAt: string;
 };
 
-// Context reducer action types
 export type UsersReducerActionTypes =
   | { type: 'setUser'; userData: Omit<User, 'password'> }
   | { type: 'logoutUser' }
   | { type: 'registerUser'; userData: Omit<User, 'password'> };
 
-// Context structure type
+
 export type UsersContextTypes = {
   loggedInUser: Omit<User, 'password'> | null;
   loginUser: (
@@ -29,8 +26,8 @@ export type UsersContextTypes = {
     stayLoggedIn: boolean
   ) => Promise<{ error: string } | { success: string }>;
   logoutUser: () => void;
-  registerUser: (
-    userData: Pick<User, 'email' | 'username' | 'password' | 'profilePicture'>,
+    registerUser: (
+    userData: Pick<User, 'email' | 'password' | 'username' | 'profilePicture'>,
     stayLoggedIn: boolean
   ) => Promise<{ error: string } | { success: string }>;
   editUser: (

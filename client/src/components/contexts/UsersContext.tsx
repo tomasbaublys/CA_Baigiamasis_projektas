@@ -60,7 +60,10 @@ const UsersProvider = ({ children }: ChildrenProp) => {
     return { success };
   };
 
-  const registerUser = async (userData: Omit<User, '_id'>, stayLoggedIn: boolean) => {
+  const registerUser = async (
+    userData: Pick<User, 'email' | 'password' | 'username' | 'profilePicture'>,
+    stayLoggedIn: boolean
+  ) => {
     const serverResponse = await fetch('http://localhost:5500/users/register', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
