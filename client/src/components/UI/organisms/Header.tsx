@@ -75,7 +75,7 @@ const Header = () => {
         {loggedInUser ? (
           <>
             <NavLink
-              to={`/user/${loggedInUser._id}`}
+              to="/user"
               style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <AccountCircleIcon style={{ color: '#f5c518', fontSize: '28px' }} />

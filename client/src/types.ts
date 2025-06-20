@@ -18,7 +18,6 @@ export type UsersReducerActionTypes =
   | { type: 'logoutUser' }
   | { type: 'registerUser'; userData: Omit<User, 'password'> };
 
-
 export type UsersContextTypes = {
   loggedInUser: Omit<User, 'password'> | null;
   loginUser: (
@@ -26,7 +25,7 @@ export type UsersContextTypes = {
     stayLoggedIn: boolean
   ) => Promise<{ error: string } | { success: string }>;
   logoutUser: () => void;
-    registerUser: (
+  registerUser: (
     userData: Pick<User, 'email' | 'password' | 'username' | 'profilePicture'>,
     stayLoggedIn: boolean
   ) => Promise<{ error: string } | { success: string }>;
@@ -38,8 +37,14 @@ export type UsersContextTypes = {
     id: string
   ) => Promise<{ error: string } | { success: string }>;
   getUserId: () => Promise<{ error: string } | { id: string }>;
-  decodeFromToken: () => Omit<User, '_id' | 'password'> | null;
+  decodeFromToken: () => Omit<User, 'password'> | null;
   dispatch: React.Dispatch<UsersReducerActionTypes>;
+};
+
+export type EditableUser = Omit<User, '_id' | 'createdAt' | 'password'> & {
+  oldPassword?: string;
+  password?: string;
+  passwordConfirm?: string;
 };
 
 export type FormInputProps = {

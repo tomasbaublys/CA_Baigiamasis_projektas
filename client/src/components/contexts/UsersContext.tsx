@@ -27,7 +27,8 @@ const UsersProvider = ({ children }: ChildrenProp) => {
     if (!token) return null;
 
     try {
-      return jwtDecode<Omit<User, '_id' | 'password'>>(token);
+      const decoded = jwtDecode<Omit<User, 'password'>>(token);
+      return decoded;
     } catch (err) {
       console.error(`Invalid access token: ${err}`);
       return null;
@@ -90,12 +91,24 @@ const UsersProvider = ({ children }: ChildrenProp) => {
   };
 
   const editUser = async (
-    userData: Partial<Omit<User, '_id' | 'email' | 'createdAt' | 'password'>> & { password?: string; oldPassword?: string },
+    userData: Partial<Omit<User, '_id' | 'email' | 'createdAt' | 'password'>> & {
+      password?: string;
+      oldPassword?: string;
+    },
     id: string
   ) => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    if (!token) {
+      return { error: 'No access token provided.' };
+    }
+
     const serverResponse = await fetch(`http://localhost:5500/users/${id}`, {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify(userData),
     });
 

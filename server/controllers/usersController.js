@@ -141,7 +141,7 @@ const getUserId = async (req, res) => {
 
     res.send({
       success: 'User ID fetched successfully.',
-      userId: DB_RESPONSE._id
+      id: DB_RESPONSE._id // <- changed from userId to id
     });
   } catch (err) {
     console.error('getUserId error:', err);
