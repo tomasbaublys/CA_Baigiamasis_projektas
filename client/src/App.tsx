@@ -4,7 +4,7 @@ import Home from "./components/pages/Home";
 import Login from "./components/pages/Login";
 import Register from "./components/pages/Register";
 import Profile from "./components/pages/Profile";
-
+import Questions from "./components/pages/Questions";
 
 const App = () => {
   return (
@@ -12,6 +12,7 @@ const App = () => {
       <Routes>
         <Route path="" element={<MainOutlet />}>
           <Route index element={<Home />} />
+          <Route path='questions' element={<Questions/>}/>
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
               <Route path="user" element={<Profile />} />

@@ -60,3 +60,36 @@ export type FormInputProps = {
   inputOnChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   inputOnBlur?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
 };
+
+export type Question = {
+  _id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  author: {
+    _id: string;
+    username: string;
+    profilePicture: string;
+  };
+  likes: string[];
+  dislikes: string[];
+  score: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type QuestionsReducerActionTypes =
+  | { type: 'setQuestions'; data: Question[] };
+
+export type QuestionsContextTypes = {
+  questions: Question[];
+  applySort: (value: string) => void;
+  applyFilter: (values: QuestionsFilterValues) => void;
+  resetFilters: () => void;
+  loading: boolean;
+};
+
+export type QuestionsFilterValues = {
+  title?: string;
+  tag?: string;
+};
