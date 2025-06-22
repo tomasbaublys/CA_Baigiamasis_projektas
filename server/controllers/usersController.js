@@ -21,8 +21,8 @@ const login = async (req, res) => {
       return res.status(401).send({ error: 'Invalid login credentials.' });
     }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = generateAccessToken({ _id, ...user });
+    const refreshToken = generateRefreshToken({ _id, ...user });
     res
       .header('Authorization', accessToken)
       .send({
@@ -110,8 +110,8 @@ const register = async (req, res) => {
     await client.db('Forum').collection('users').insertOne(newUser);
 
     const { password: _, _id, ...userData } = newUser;
-    const accessToken = generateAccessToken(userData);
-    const refreshToken = generateRefreshToken(userData);
+    const accessToken = generateAccessToken({ _id, ...userData });
+    const refreshToken = generateRefreshToken({ _id, ...userData });
 
     res.status(201).header('Authorization', accessToken).send({
       success: `[${newUser.email}] was registered successfully.`,

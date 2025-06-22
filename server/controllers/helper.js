@@ -22,3 +22,46 @@ export const verifyAccessToken = (token) => {
 export const verifyRefreshToken = (token) => {
   return jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 };
+
+export const dynamicQuery = (reqQuery) => {
+  const settings = {
+    filter: {},
+    sort: {},
+    skip: 0,
+    limit: 20
+  };
+
+  if (Object.keys(reqQuery).length) {
+    Object.keys(reqQuery).forEach(key => {
+      const [action, field, operator] = key.split('_');
+
+      if (action === 'sort') {
+        settings.sort[field] = Number(reqQuery[key]);
+        settings.sort._id = 1;
+      } else if (action === 'skip') {
+        settings.skip = Number(reqQuery[key]);
+      } else if (action === 'limit') {
+        settings.limit = Number(reqQuery[key]);
+      } else if (action === 'filter') {
+        if (!operator) {
+          if (/^true|^false/i.test(reqQuery[key])) {
+            settings.filter[field] = /^true$/i.test(reqQuery[key]);
+          } else {
+            settings.filter[field] = { $regex: new RegExp(reqQuery[key], 'i') };
+          }
+        } else {
+          const $operator = '$' + operator;
+          if (operator === 'in' || operator === 'all') {
+            settings.filter[field] = { [$operator]: reqQuery[key].split('_') };
+          } else if (!settings.filter[field]) {
+            settings.filter[field] = { [$operator]: Number(reqQuery[key]) };
+          } else {
+            settings.filter[field][$operator] = Number(reqQuery[key]);
+          }
+        }
+      }
+    });
+  }
+
+  return settings;
+};
