@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router';
+import { useParams, Link } from 'react-router';
 import styled from 'styled-components';
 
 import QuestionsContext from '../contexts/QuestionsContext';
-import { Question, QuestionsContextTypes } from '../../types';
+import UsersContext from '../contexts/UsersContext';
+
+import { Question, QuestionsContextTypes, UsersContextTypes } from '../../types';
 
 const Wrapper = styled.div`
   padding: 2rem 1rem;
@@ -34,9 +36,24 @@ const Error = styled.p`
   font-weight: bold;
 `;
 
+const EditButton = styled(Link)`
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 8px 16px;
+  background-color: #f5c518;
+  color: #181818;
+  font-weight: bold;
+  border-radius: 5px;
+  text-decoration: none;
+  &:hover {
+    background-color: #e2b33c;
+  }
+`;
+
 const SpecificQuestion = () => {
   const { id } = useParams();
   const { getQuestionById } = useContext(QuestionsContext) as QuestionsContextTypes;
+  const { loggedInUser } = useContext(UsersContext) as UsersContextTypes;
 
   const [question, setQuestion] = useState<Question | null>(null);
   const [error, setError] = useState('');
@@ -75,6 +92,8 @@ const SpecificQuestion = () => {
     );
   }
 
+  const isAuthor = loggedInUser && question.author._id === loggedInUser._id;
+
   return (
     <Wrapper>
       <Title>{question.title}</Title>
@@ -83,6 +102,12 @@ const SpecificQuestion = () => {
         {new Date(question.createdAt).toLocaleString()}
       </Meta>
       <Body>{question.description}</Body>
+
+      {isAuthor && (
+        <EditButton to={`/questions/${question._id}/edit`}>
+          Edit Question
+        </EditButton>
+      )}
     </Wrapper>
   );
 };

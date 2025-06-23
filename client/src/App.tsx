@@ -7,6 +7,7 @@ import Profile from "./components/pages/Profile";
 import Questions from "./components/pages/Questions";
 import AskQuestion from "./components/pages/AskQuestions";
 import SpecificQuestion from "./components/pages/SpecificQuestion";
+import EditQuestion from "./components/pages/EditQuestion";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="questions" element={<Questions />} />
           <Route path="ask" element={<AskQuestion />} />
           <Route path="questions/:id" element={<SpecificQuestion/>} />
+          <Route path="/questions/:id/edit" element={<EditQuestion />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
           <Route path="user" element={<Profile />} />

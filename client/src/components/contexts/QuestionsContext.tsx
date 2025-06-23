@@ -85,40 +85,73 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     fetchQuestions();
   };
 
-const createQuestion: QuestionsContextTypes['createQuestion'] = async (questionData) => {
-  const token =
-    localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  const createQuestion: QuestionsContextTypes['createQuestion'] = async (questionData) => {
+    const token =
+      localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
-  if (!token) {
-    return { error: 'Unauthorized. Please log in.' };
-  }
-
-  try {
-    const res = await fetch('http://localhost:5500/questions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(questionData),
-    });
-
-    const data = await res.json();
-
-    if (!res.ok || !data.questionData || !data.questionData._id) {
-      return { error: data.error || 'Failed to create question.' };
+    if (!token) {
+      return { error: 'Unauthorized. Please log in.' };
     }
 
-    dispatch({ type: 'addQuestion', questionData: data.questionData });
-    return {
-      success: 'Question created successfully.',
-      newQuestionId: data.questionData._id,
-    };
-  } catch (error) {
-    console.error('Error creating question:', error);
-    return { error: 'Something went wrong. Please try again.' };
-  }
-};
+    try {
+      const res = await fetch('http://localhost:5500/questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(questionData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.questionData || !data.questionData._id) {
+        return { error: data.error || 'Failed to create question.' };
+      }
+
+      dispatch({ type: 'addQuestion', questionData: data.questionData });
+      return {
+        success: 'Question created successfully.',
+        newQuestionId: data.questionData._id,
+      };
+    } catch (error) {
+      console.error('Error creating question:', error);
+      return { error: 'Something went wrong. Please try again.' };
+    }
+  };
+  const editQuestion: QuestionsContextTypes['editQuestion'] = async (
+    id,
+    updatedFields
+  ) => {
+    const token =
+      localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    if (!token) {
+      return { error: 'Unauthorized. Please log in.' };
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5500/questions/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(updatedFields),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        return { error: data.error || 'Failed to update question.' };
+      }
+
+      return { success: data.success };
+    } catch (error) {
+      console.error('Error editing question:', error);
+      return { error: 'Something went wrong. Please try again.' };
+    }
+  };
 
   const getQuestionById = async (id: string): Promise<{ error: string } | { question: Question }> => {
     try {
@@ -149,6 +182,7 @@ const createQuestion: QuestionsContextTypes['createQuestion'] = async (questionD
         resetFilters,
         loading,
         createQuestion,
+        editQuestion,
         dispatch,
         getQuestionById,
       }}

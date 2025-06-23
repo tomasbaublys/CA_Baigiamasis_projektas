@@ -48,7 +48,6 @@ export type EditableUser = Omit<User, '_id' | 'createdAt' | 'password'> & {
 };
 
 export type FormInputProps = {
-  labelHtmlFor: string;
   labelText: string;
   inputType: string;
   inputName: string;
@@ -92,6 +91,10 @@ export type QuestionsContextTypes = {
     questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
   ) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
   getQuestionById: (id: string) => Promise<{ error: string } | { question: Question }>;
+  editQuestion: (
+    id: string,
+    updatedFields: Partial<Pick<Question, 'title' | 'description' | 'tags'>>
+  ) => Promise<{ error: string } | { success: string }>;
   dispatch: React.Dispatch<QuestionsReducerActionTypes>;
 };
 
