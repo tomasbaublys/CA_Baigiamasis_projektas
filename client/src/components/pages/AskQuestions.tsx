@@ -102,123 +102,123 @@ const FooterText = styled.p`
 `;
 
 const AskQuestion = () => {
-    const navigate = useNavigate();
-    const { loggedInUser } = useContext(UsersContext) as UsersContextTypes;
-    const { createQuestion } = useContext(QuestionsContext) as QuestionsContextTypes;
-    const [message, setMessage] = useState('');
+  const navigate = useNavigate();
+  const { loggedInUser } = useContext(UsersContext) as UsersContextTypes;
+  const { createQuestion } = useContext(QuestionsContext) as QuestionsContextTypes;
+  const [message, setMessage] = useState('');
 
-    const initialValues = {
-        title: '',
-        description: '',
-        tags: ''
-    };
+  const initialValues = {
+    title: '',
+    description: '',
+    tags: ''
+  };
 
-    const validationSchema = Yup.object({
-        title: Yup.string()
-            .required('Title is required.')
-            .min(5, 'Minimum 5 characters.')
-            .max(120, 'Maximum 120 characters.')
-            .trim(),
+  const validationSchema = Yup.object({
+    title: Yup.string()
+      .required('Title is required.')
+      .min(5, 'Minimum 5 characters.')
+      .max(120, 'Maximum 120 characters.')
+      .trim(),
 
-        description: Yup.string()
-            .required('Description is required.')
-            .min(30, 'Minimum 30 characters.')
-            .max(5000, 'Maximum 5000 characters.')
-            .trim(),
+    description: Yup.string()
+      .required('Description is required.')
+      .min(30, 'Minimum 30 characters.')
+      .max(5000, 'Maximum 5000 characters.')
+      .trim(),
 
-        tags: Yup.string()
-            .required('At least one tag is required.')
-            .matches(/^([a-zA-Z0-9]+,?\s*)+$/, 'Tags must be comma-separated words.')
-            .trim()
-    });
+    tags: Yup.string()
+      .required('At least one tag is required.')
+      .matches(/^([a-zA-Z0-9]+,?\s*)+$/, 'Tags must be comma-separated words.')
+      .trim()
+  });
 
-    const formik = useFormik({
-        initialValues,
-        validationSchema,
-        onSubmit: async (values) => {
-            if (!loggedInUser) {
-                setMessage('You must be logged in to ask a question.');
-                return;
-            }
+  const formik = useFormik({
+    initialValues,
+    validationSchema,
+    onSubmit: async (values) => {
+      if (!loggedInUser) {
+        setMessage('You must be logged in to ask a question.');
+        return;
+      }
 
-            const response = await createQuestion({
-                title: values.title.trim(),
-                description: values.description.trim(),
-                tags: values.tags.split(',').map((t) => t.trim()).filter(Boolean),
-                author: {
-                    _id: loggedInUser._id,
-                    username: loggedInUser.username,
-                    profilePicture: loggedInUser.profilePicture,
-                }
-            });
+      const response = await createQuestion({
+        title: values.title.trim(),
+        description: values.description.trim(),
+        tags: values.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        author: {
+          _id: loggedInUser._id,
+          username: loggedInUser.username,
+          profilePicture: loggedInUser.profilePicture,
+        },
+      });
+      
+      if ('error' in response) {
+        setMessage(response.error);
+      } else {
+        const id = response.newQuestionId;
+        navigate(`/questions/${id}`);
+      }
+    },
+  });
 
-            if ('error' in response) {
-                setMessage(response.error);
-            } else {
-                setMessage('Question posted!');
-                setTimeout(() => navigate('/'), 1800);
-            }
-        }
-    });
+  return (
+    <PageWrapper>
+      <Card>
+        <Title>Ask a New Question</Title>
 
-    return (
-        <PageWrapper>
-            <Card>
-                <Title>Ask a New Question</Title>
+        <StyledForm onSubmit={formik.handleSubmit}>
+          <StyledFieldWrapper>
+            <InputField
+              labelText="Title"
+              inputType="text"
+              inputName="title"
+              inputId="title"
+              inputValue={formik.values.title}
+              inputOnChange={formik.handleChange}
+              inputOnBlur={formik.handleBlur}
+              errors={formik.errors.title}
+              touched={formik.touched.title}
+              inputPlaceholder="e.g., How to use useEffect in React?"
+            />
+          </StyledFieldWrapper>
 
-                <StyledForm onSubmit={formik.handleSubmit}>
-                    <StyledFieldWrapper>
-                        <InputField
-                            labelText="Title"
-                            inputType="text"
-                            inputName="title"
-                            inputId="title"
-                            inputValue={formik.values.title}
-                            inputOnChange={formik.handleChange}
-                            inputOnBlur={formik.handleBlur}
-                            errors={formik.errors.title}
-                            touched={formik.touched.title}
-                            inputPlaceholder="e.g., How to use useEffect in React?"
-                        />
-                    </StyledFieldWrapper>
+          <StyledFieldWrapper>
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              placeholder="Include all the details someone would need to answer your question..."
+            />
+            {formik.errors.description && formik.touched.description && (
+              <p className="error">{formik.errors.description}</p>
+            )}
+          </StyledFieldWrapper>
 
-                    <StyledFieldWrapper>
-                        <label htmlFor="description">Description</label>
-                        <textarea
-                            id="description"
-                            name="description"
-                            value={formik.values.description}
-                            onChange={formik.handleChange}
-                            onBlur={formik.handleBlur}
-                            placeholder="Include all the details someone would need to answer your question..."
-                        />
-                        {formik.errors.description && formik.touched.description && (
-                            <p className="error">{formik.errors.description}</p>
-                        )}
-                    </StyledFieldWrapper>
+          <StyledFieldWrapper>
+            <InputField
+              labelText="Tags (comma-separated)"
+              inputType="text"
+              inputName="tags"
+              inputId="tags"
+              inputValue={formik.values.tags}
+              inputOnChange={formik.handleChange}
+              inputOnBlur={formik.handleBlur}
+              errors={formik.errors.tags}
+              touched={formik.touched.tags}
+              inputPlaceholder="e.g., react, hooks, formik"
+            />
+          </StyledFieldWrapper>
 
-                    <StyledFieldWrapper>
-                        <InputField
-                            labelText="Tags (comma-separated)"
-                            inputType="text"
-                            inputName="tags"
-                            inputId="tags"
-                            inputValue={formik.values.tags}
-                            inputOnChange={formik.handleChange}
-                            inputOnBlur={formik.handleBlur}
-                            errors={formik.errors.tags}
-                            touched={formik.touched.tags}
-                            inputPlaceholder="e.g., react, hooks, formik"
-                        />
-                    </StyledFieldWrapper>
+          <SubmitButton type="submit">Post Question</SubmitButton>
+        </StyledForm>
 
-                    <SubmitButton type="submit">Post Question</SubmitButton>
-                </StyledForm>
-
-                {message && <FooterText style={{ color: '#f5c518' }}>{message}</FooterText>}
-            </Card>
-        </PageWrapper>
-    );
+        {message && <FooterText style={{ color: '#f5c518' }}>{message}</FooterText>}
+      </Card>
+    </PageWrapper>
+  );
 };
 
 export default AskQuestion;

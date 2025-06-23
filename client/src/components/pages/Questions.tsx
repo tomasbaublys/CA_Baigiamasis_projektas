@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import { useContext } from 'react';
+import { Link } from 'react-router'; // ✅ Added this line
 import QuestionsContext from '../../components/contexts/QuestionsContext.tsx';
 import type { Question } from '../../types';
 
@@ -37,6 +38,15 @@ const QuestionTitle = styled.h3`
   color: #f5c518;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
+
+  a {
+    color: #f5c518;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const Description = styled.p`
@@ -76,7 +86,9 @@ const Questions = () => {
       ) : (
         questions.map((question: Question) => (
           <QuestionCard key={question._id}>
-            <QuestionTitle>{question.title}</QuestionTitle>
+            <QuestionTitle>
+              <Link to={`/questions/${question._id}`}>{question.title}</Link>
+            </QuestionTitle>
             <Description>{question.description}</Description>
             <Meta>
               <Author>👤 {question.author.username}</Author>

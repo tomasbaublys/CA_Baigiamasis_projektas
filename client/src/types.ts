@@ -89,8 +89,9 @@ export type QuestionsContextTypes = {
   resetFilters: () => void;
   loading: boolean;
   createQuestion: (
-  questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
-) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
+    questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
+  ) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
+  getQuestionById: (id: string) => Promise<{ error: string } | { question: Question }>;
   dispatch: React.Dispatch<QuestionsReducerActionTypes>;
 };
 
