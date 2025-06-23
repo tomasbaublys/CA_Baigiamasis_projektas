@@ -12,7 +12,9 @@ const QuestionsContext = createContext<QuestionsContextTypes | undefined>(undefi
 const reducer = (state: Question[], action: QuestionsReducerActionTypes): Question[] => {
   switch (action.type) {
     case 'setQuestions':
-      return action.data;
+      return action.questionData;
+    case 'addQuestion':
+      return [action.questionData, ...state];
     default:
       console.error('Unknown reducer action');
       return state;
@@ -38,7 +40,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     fetch(url)
       .then((res) => res.json())
       .then((data: Question[]) => {
-        dispatch({ type: 'setQuestions', data: data });
+        dispatch({ type: 'setQuestions', questionData: data });
         setLoading(false);
       })
       .catch((err) => {
@@ -83,6 +85,38 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     fetchQuestions();
   };
 
+  const createQuestion: QuestionsContextTypes['createQuestion'] = async (questionData) => {
+    const token =
+      localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    if (!token) {
+      return { error: 'Unauthorized. Please log in.' };
+    }
+
+    try {
+      const res = await fetch('http://localhost:5500/questions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(questionData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        return { error: data.error || 'Failed to create question.' };
+      }
+
+      dispatch({ type: 'addQuestion', questionData: data.newQuestion });
+      return { success: 'Question created successfully.', newQuestionId: data.newQuestion._id };
+    } catch (error) {
+      console.error('Error creating question:', error);
+      return { error: 'Something went wrong. Please try again.' };
+    }
+  };
+
   useEffect(() => {
     fetchQuestions();
   }, []);
@@ -95,6 +129,8 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
         applyFilter,
         resetFilters,
         loading,
+        createQuestion,
+        dispatch,
       }}
     >
       {children}

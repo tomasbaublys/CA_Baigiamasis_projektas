@@ -5,6 +5,7 @@ import Login from "./components/pages/Login";
 import Register from "./components/pages/Register";
 import Profile from "./components/pages/Profile";
 import Questions from "./components/pages/Questions";
+import AskQuestion from "./components/pages/AskQuestions";
 
 const App = () => {
   return (
@@ -12,10 +13,11 @@ const App = () => {
       <Routes>
         <Route path="" element={<MainOutlet />}>
           <Route index element={<Home />} />
-          <Route path='questions' element={<Questions/>}/>
+          <Route path="questions" element={<Questions />} />
+          <Route path="ask" element={<AskQuestion />} />
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Register />} />
-              <Route path="user" element={<Profile />} />
+          <Route path="user" element={<Profile />} />
         </Route>
       </Routes>
     </>

@@ -79,7 +79,8 @@ export type Question = {
 };
 
 export type QuestionsReducerActionTypes =
-  | { type: 'setQuestions'; data: Question[] };
+  | { type: 'setQuestions'; questionData: Question[] }
+  | { type: 'addQuestion'; questionData: Question };
 
 export type QuestionsContextTypes = {
   questions: Question[];
@@ -87,6 +88,10 @@ export type QuestionsContextTypes = {
   applyFilter: (values: QuestionsFilterValues) => void;
   resetFilters: () => void;
   loading: boolean;
+  createQuestion: (
+  questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
+) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
+  dispatch: React.Dispatch<QuestionsReducerActionTypes>;
 };
 
 export type QuestionsFilterValues = {
