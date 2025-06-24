@@ -1,10 +1,10 @@
 import styled from 'styled-components';
-import { useContext } from 'react';
-import { Link } from 'react-router'; // ✅ Added this line
+import { useContext, useEffect } from 'react'; // ✅ Added useEffect
+import { useLocation, Link } from 'react-router'; // ✅ Added useLocation
 import QuestionsContext from '../../components/contexts/QuestionsContext.tsx';
 import type { Question } from '../../types';
 
-// Styled-components (top of file for clarity and structure)
+// Styled-components
 const Wrapper = styled.div`
   max-width: 800px;
   margin: 2rem auto;
@@ -66,15 +66,16 @@ const Meta = styled.div`
 const Author = styled.span``;
 const CreatedAt = styled.span``;
 
-// Component
 const Questions = () => {
-  const context = useContext(QuestionsContext);
+  const location = useLocation();
+  const { questions, loading, fetchQuestions } = useContext(QuestionsContext)!;
 
-  if (!context) {
-    return <Message>Questions context is not available.</Message>;
-  }
-
-  const { questions, loading } = context;
+  useEffect(() => {
+    if (location.pathname === '/questions') {
+      fetchQuestions();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
 
   if (loading) return <Message>Loading questions...</Message>;
 

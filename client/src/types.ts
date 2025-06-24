@@ -87,6 +87,7 @@ export type QuestionsContextTypes = {
   applyFilter: (values: QuestionsFilterValues) => void;
   resetFilters: () => void;
   loading: boolean;
+  fetchQuestions: () => Promise<void>; 
   createQuestion: (
     questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
   ) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
@@ -95,6 +96,7 @@ export type QuestionsContextTypes = {
     id: string,
     updatedFields: Partial<Pick<Question, 'title' | 'description' | 'tags'>>
   ) => Promise<{ error: string } | { success: string }>;
+  deleteQuestion: (id: string) => Promise<{ success?: string; error?: string }>;
   dispatch: React.Dispatch<QuestionsReducerActionTypes>;
 };
 

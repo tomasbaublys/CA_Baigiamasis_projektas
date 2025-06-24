@@ -28,7 +28,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const filterQueryRef = useRef('');
   const sortQueryRef = useRef('');
 
-  const fetchQuestions = () => {
+  const fetchQuestions = async (): Promise<void> => {
     setLoading(true);
 
     const query = [filterQueryRef.current, sortQueryRef.current]
@@ -37,16 +37,15 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
 
     const url = `http://localhost:5500/questions${query ? `?${query}` : ''}`;
 
-    fetch(url)
-      .then((res) => res.json())
-      .then((data: Question[]) => {
-        dispatch({ type: 'setQuestions', questionData: data });
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error('Failed to fetch questions:', err);
-        setLoading(false);
-      });
+    try {
+      const res = await fetch(url);
+      const data: Question[] = await res.json();
+      dispatch({ type: 'setQuestions', questionData: data });
+    } catch (err) {
+      console.error('Failed to fetch questions:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const applySort = (sortValue: string) => {
@@ -153,6 +152,29 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     }
   };
 
+  const deleteQuestion = async (id: string) => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    if (!token) {
+      return { error: 'Unauthorized. Please log in.' };
+    }
+
+    try {
+      const res = await fetch(`http://localhost:5500/questions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      console.error('Delete error:', err);
+      return { error: 'Failed to delete question. Please try again later.' };
+    }
+  };
+
   const getQuestionById = async (id: string): Promise<{ error: string } | { question: Question }> => {
     try {
       const res = await fetch(`http://localhost:5500/questions/${id}`);
@@ -181,10 +203,12 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
         applyFilter,
         resetFilters,
         loading,
+        fetchQuestions,
         createQuestion,
         editQuestion,
+        deleteQuestion,
         dispatch,
-        getQuestionById,
+        getQuestionById
       }}
     >
       {children}
