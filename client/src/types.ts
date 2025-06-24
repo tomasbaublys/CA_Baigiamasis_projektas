@@ -103,4 +103,6 @@ export type QuestionsContextTypes = {
 export type QuestionsFilterValues = {
   title?: string;
   tag?: string;
+  createdAt_gte: string;
+  createdAt_lte: string;
 };

@@ -48,21 +48,22 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     }
   };
 
-  const applySort = (sortValue: string) => {
-    if (sortValue === 'dateAsc') {
-      sortQueryRef.current = 'sort_createdAt=1';
-    } else if (sortValue === 'dateDesc') {
-      sortQueryRef.current = 'sort_createdAt=-1';
-    } else if (sortValue === 'scoreAsc') {
-      sortQueryRef.current = 'sort_score=1';
-    } else if (sortValue === 'scoreDesc') {
-      sortQueryRef.current = 'sort_score=-1';
-    } else {
-      sortQueryRef.current = '';
-    }
+const applySort = (sortValue: string) => {
+  if (sortValue === 'dateAsc') {
+    sortQueryRef.current = 'sort_createdAt=1';
+  } else if (sortValue === 'dateDesc') {
+    sortQueryRef.current = 'sort_createdAt=-1';
+  } else if (sortValue === 'scoreAsc') {
+    sortQueryRef.current = 'sort_score=1';
+  } else if (sortValue === 'scoreDesc') {
+    sortQueryRef.current = 'sort_score=-1';
+  } else {
+    sortQueryRef.current = '';
+  }
 
-    fetchQuestions();
-  };
+  fetchQuestions();
+};
+  
 
   const applyFilter = (values: QuestionsFilterValues) => {
     const filters: string[] = [];
@@ -118,6 +119,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
       return { error: 'Something went wrong. Please try again.' };
     }
   };
+
   const editQuestion: QuestionsContextTypes['editQuestion'] = async (
     id,
     updatedFields
@@ -208,7 +210,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
         editQuestion,
         deleteQuestion,
         dispatch,
-        getQuestionById
+        getQuestionById,
       }}
     >
       {children}
