@@ -10,34 +10,88 @@ import UsersContext from '../contexts/UsersContext.tsx';
 import { QuestionsContextTypes, UsersContextTypes } from '../../types.ts';
 import InputField from '../../components/UI/molecules/InputField.tsx';
 
-const FormContainer = styled.form`
-  max-width: 320px;
-  margin: 40px auto;
-  padding: 20px;
-  background-color: #1c1c1c;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+const PageWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #181818;
+  min-height: 100vh;
+  padding: 3rem 1rem;
+  color: #fff;
 `;
 
-const FormTitle = styled.h2`
+const Card = styled.div`
+  width: 320px;
+  background-color: #1f1f1f;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 20px 25px;
+  color: #fff;
+`;
+
+const Title = styled.h1`
+  font-size: 20px;
+  font-weight: 400;
+  margin-bottom: 24px;
   text-align: center;
-  color: #f5c518;
-  margin-bottom: 20px;
+`;
+
+const StyledForm = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+const StyledFieldWrapper = styled.div`
+  input, textarea {
+    background-color: #2a2a2a;
+    color: white;
+    border: 1px solid #555;
+    border-radius: 3px;
+    padding: 6px;
+    font-size: 12px;
+    width: 100%;
+
+    &:focus {
+      outline: none;
+      border-color: #f5c518;
+    }
+  }
+
+  textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+
+  label {
+    font-size: 12px;
+    font-weight: bold;
+    color: #ccc;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .error {
+    font-size: 12px;
+    color: #f56262;
+    margin-top: 4px;
+  }
 `;
 
 const SubmitButton = styled.button`
-  width: 100%;
-  padding: 10px;
   background-color: #f5c518;
-  color: #000;
-  font-weight: bold;
   border: none;
-  border-radius: 6px;
-  margin-top: 10px;
+  border-radius: 20px;
+  width: 100%;
+  padding: 8px 0;
+  font-size: 13px;
+  margin-top: 8px;
   cursor: pointer;
+  font-weight: bold;
+  color: #181818;
 
   &:hover {
-    background-color: #ffe871;
+    background-color: #e2b33c;
   }
 `;
 
@@ -98,47 +152,57 @@ const EditQuestion = () => {
   });
 
   return (
-    <FormContainer onSubmit={formik.handleSubmit}>
-      <FormTitle>Edit Your Question</FormTitle>
+    <PageWrapper>
+      <Card>
+        <Title>Edit Your Question</Title>
 
-      <InputField
-        labelText="Title"
-        inputType="text"
-        inputName="title"
-        inputId="title"
-        inputValue={formik.values.title}
-        errors={formik.errors.title}
-        touched={formik.touched.title}
-        inputOnChange={formik.handleChange}
-        inputOnBlur={formik.handleBlur}
-      />
+        <StyledForm onSubmit={formik.handleSubmit}>
+          <StyledFieldWrapper>
+            <InputField
+              labelText="Title"
+              inputType="text"
+              inputName="title"
+              inputId="title"
+              inputValue={formik.values.title}
+              errors={formik.errors.title}
+              touched={formik.touched.title}
+              inputOnChange={formik.handleChange}
+              inputOnBlur={formik.handleBlur}
+            />
+          </StyledFieldWrapper>
 
-      <InputField
-        labelText="Description"
-        inputType="textarea"
-        inputName="description"
-        inputId="description"
-        inputValue={formik.values.description}
-        errors={formik.errors.description}
-        touched={formik.touched.description}
-        inputOnChange={formik.handleChange}
-        inputOnBlur={formik.handleBlur}
-      />
+          <StyledFieldWrapper>
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formik.values.description}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            />
+            {formik.errors.description && formik.touched.description && (
+              <p className="error">{formik.errors.description}</p>
+            )}
+          </StyledFieldWrapper>
 
-      <InputField
-        labelText="Tags (comma separated)"
-        inputType="text"
-        inputName="tags"
-        inputId="tags"
-        inputValue={formik.values.tags}
-        errors={formik.errors.tags}
-        touched={formik.touched.tags}
-        inputOnChange={formik.handleChange}
-        inputOnBlur={formik.handleBlur}
-      />
+          <StyledFieldWrapper>
+            <InputField
+              labelText="Tags (comma separated)"
+              inputType="text"
+              inputName="tags"
+              inputId="tags"
+              inputValue={formik.values.tags}
+              errors={formik.errors.tags}
+              touched={formik.touched.tags}
+              inputOnChange={formik.handleChange}
+              inputOnBlur={formik.handleBlur}
+            />
+          </StyledFieldWrapper>
 
-      <SubmitButton type="submit">Update Question</SubmitButton>
-    </FormContainer>
+          <SubmitButton type="submit">Update Question</SubmitButton>
+        </StyledForm>
+      </Card>
+    </PageWrapper>
   );
 };
 
