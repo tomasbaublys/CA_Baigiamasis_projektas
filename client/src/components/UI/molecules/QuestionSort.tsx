@@ -36,8 +36,8 @@ const QuestionSort = () => {
         <Option value="">Default</Option>
         <Option value="dateDesc">Newest first ↑</Option>
         <Option value="dateAsc">Oldest first ↓</Option>
-        <Option value="scoreDesc">Most answers ↑</Option>
-        <Option value="scoreAsc">Least answers ↓</Option>
+        <Option value="answersDesc">Most answers ↑</Option>
+        <Option value="answersAsc">Least answers ↓</Option>
       </Select>
     </Container>
   );

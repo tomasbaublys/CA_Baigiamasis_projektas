@@ -40,6 +40,17 @@ const fetchQuestions = async (): Promise<void> => {
   try {
     const res = await fetch(url);
     const data: Question[] = await res.json();
+
+    // Manual frontend sort for answersCount
+    if (sortQueryRef.current.includes('sort_answersCount')) {
+      const sortOrder = sortQueryRef.current.endsWith('=1') ? 1 : -1;
+      data.sort((a, b) => {
+        const aCount = a.answersCount ?? 0;
+        const bCount = b.answersCount ?? 0;
+        return sortOrder * (aCount - bCount);
+      });
+    }
+
     dispatch({ type: 'setQuestions', questionData: data });
   } catch (err) {
     console.error('Failed to fetch questions:', err);
@@ -53,10 +64,10 @@ const fetchQuestions = async (): Promise<void> => {
       sortQueryRef.current = 'sort_createdAt=1';
     } else if (sortValue === 'dateDesc') {
       sortQueryRef.current = 'sort_createdAt=-1';
-    } else if (sortValue === 'scoreAsc') {
-      sortQueryRef.current = 'sort_score=1';
-    } else if (sortValue === 'scoreDesc') {
-      sortQueryRef.current = 'sort_score=-1';
+    } else if (sortValue === 'answersAsc') {
+      sortQueryRef.current = 'sort_answersCount=1';
+    } else if (sortValue === 'answersDesc') {
+      sortQueryRef.current = 'sort_answersCount=-1';
     } else {
       sortQueryRef.current = '';
     }
@@ -152,28 +163,28 @@ const fetchQuestions = async (): Promise<void> => {
     }
   };
 
-const deleteQuestion = async (id: string) => {
-  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+  const deleteQuestion = async (id: string) => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
-  if (!token) {
-    return { error: 'Unauthorized. Please log in.' };
-  }
+    if (!token) {
+      return { error: 'Unauthorized. Please log in.' };
+    }
 
-  try {
-    const res = await fetch(`http://localhost:5500/questions/${id}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const res = await fetch(`http://localhost:5500/questions/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    const data = await res.json();
-    return data;
-  } catch (err) {
-    console.error('Delete error:', err);
-    return { error: 'Failed to delete question. Please try again later.' };
-  }
-};
+      const data = await res.json();
+      return data;
+    } catch (err) {
+      console.error('Delete error:', err);
+      return { error: 'Failed to delete question. Please try again later.' };
+    }
+  };
 
   const getQuestionById = async (id: string): Promise<{ error: string } | { question: Question }> => {
     try {

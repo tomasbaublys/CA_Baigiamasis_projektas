@@ -139,6 +139,7 @@ const Questions = () => {
                   <Description>{question.description}</Description>
                   <Meta>
                     <Author>👤 {question.author.username}</Author>
+                    <span>💬 {question.answersCount ?? 0} answers</span>
                     <CreatedAt>{new Date(question.createdAt).toLocaleDateString()}</CreatedAt>
                   </Meta>
                 </QuestionCard>
