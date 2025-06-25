@@ -8,7 +8,7 @@ export const connectDB = async () => {
 };
 
 export const generateAccessToken = (payload) => {
-  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: "2h"});
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET, { expiresIn: "2h" });
 };
 
 export const generateRefreshToken = (payload) => {
@@ -64,4 +64,41 @@ export const dynamicQuery = (reqQuery) => {
   }
 
   return settings;
+};
+
+export const addCountToDocuments = async (client, {
+  dbName,
+  sourceDocs,
+  matchCollection,
+  matchField,
+  groupField = matchField,
+  countFieldName = 'count'
+}) => {
+  const ids = sourceDocs.map(doc => doc._id);
+
+  const matchStage = {
+    $match: {
+      [matchField]: { $in: ids }
+    }
+  };
+
+  const groupStage = {
+    $group: {
+      _id: `$${groupField}`,
+      count: { $sum: 1 }
+    }
+  };
+
+  const counts = await client
+    .db(dbName)
+    .collection(matchCollection)
+    .aggregate([matchStage, groupStage])
+    .toArray();
+
+  const countsMap = Object.fromEntries(counts.map(entry => [entry._id, entry.count]));
+
+  return sourceDocs.map(doc => ({
+    ...doc,
+    [countFieldName]: countsMap[doc._id] || 0
+  }));
 };

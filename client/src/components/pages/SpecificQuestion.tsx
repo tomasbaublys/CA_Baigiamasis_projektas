@@ -5,6 +5,10 @@ import styled from 'styled-components';
 import { Question, QuestionsContextTypes, UsersContextTypes } from '../../types';
 import QuestionsContext from '../contexts/QuestionsContext';
 import UsersContext from '../contexts/UsersContext';
+import AnswersContext from '../contexts/AnswersContext';
+
+import AddAnswer from '../UI/organisms/AddAnswer';
+import AnswerCard from '../UI/molecules/AnswerCard';
 
 const Wrapper = styled.div`
   padding: 2rem 1rem;
@@ -110,7 +114,7 @@ const SpecificQuestion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { getQuestionById, deleteQuestion  } = useContext(QuestionsContext) as QuestionsContextTypes;
+  const { getQuestionById, deleteQuestion } = useContext(QuestionsContext) as QuestionsContextTypes;
   const { decodeFromToken } = useContext(UsersContext) as UsersContextTypes;
 
   const [question, setQuestion] = useState<Question | null>(null);
@@ -121,19 +125,28 @@ const SpecificQuestion = () => {
 
   const decodedUser = decodeFromToken();
 
+  const { answers, getAnswersByQuestionId } = useContext(AnswersContext);
+
   useEffect(() => {
     if (!id) return;
-    getQuestionById(id).then((res) => {
-      if ('error' in res) {
-        setError(res.error);
-      } else {
-        setQuestion(res.question);
+
+    const fetchData = async () => {
+      const questionRes = await getQuestionById(id);
+      if ('error' in questionRes) {
+        setError(questionRes.error);
+        return;
       }
-    });
-  }, [id, getQuestionById]);
+
+      setQuestion(questionRes.question);
+      await getAnswersByQuestionId(id);
+    };
+
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const handleInitialDelete = () => {
-    const hasAnswers = true; // Assume answers exist for now
+    const hasAnswers = true;
     if (hasAnswers) {
       setShowDeleteConfirm(true);
     } else {
@@ -198,12 +211,13 @@ const SpecificQuestion = () => {
         </DeleteWarning>
       )}
 
-      {deleteError && (
-        <p style={{ color: '#f56262', marginTop: '1rem' }}>{deleteError}</p>
-      )}
-      {deleteMessage && (
-        <p style={{ color: '#f5c518', marginTop: '1rem' }}>{deleteMessage}</p>
-      )}
+      {deleteError && <p style={{ color: '#f56262', marginTop: '1rem' }}>{deleteError}</p>}
+      {deleteMessage && <p style={{ color: '#f5c518', marginTop: '1rem' }}>{deleteMessage}</p>}
+
+      {answers.map(answer => (
+        <AnswerCard key={answer._id} answer={answer} />
+      ))}
+      <AddAnswer />
     </Wrapper>
   );
 };

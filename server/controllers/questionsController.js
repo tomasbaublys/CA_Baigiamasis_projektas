@@ -1,5 +1,5 @@
 import { v4 as generateID, validate as uuidValidate } from 'uuid';
-import { connectDB, dynamicQuery } from './helper.js';
+import { connectDB, dynamicQuery, addCountToDocuments } from './helper.js';
 
 // CREATE QUESTION
 const createQuestion = async (req, res) => {
@@ -83,7 +83,15 @@ const getAllQuestions = async (req, res) => {
       .limit(settings.limit)
       .toArray();
 
-    res.send(data);
+    const dataWithCount = await addCountToDocuments(client, {
+      dbName: 'Forum',
+      sourceDocs: data,
+      matchCollection: 'answers',
+      matchField: 'questionId',
+      countFieldName: 'answersCount'
+    });
+
+    res.send(dataWithCount);
   } catch (err) {
     console.error('getAllQuestions error:', err);
     res.status(500).send({ error: `Server error. ${err}` });
