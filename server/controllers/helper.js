@@ -24,46 +24,49 @@ export const verifyRefreshToken = (token) => {
 };
 
 export const dynamicQuery = (reqQuery) => {
-  const settings = {
-    filter: {},
-    sort: {},
-    skip: 0,
-    limit: 20
-  };
-
-  if (Object.keys(reqQuery).length) {
-    Object.keys(reqQuery).forEach(key => {
-      const [action, field, operator] = key.split('_');
-
-      if (action === 'sort') {
-        settings.sort[field] = Number(reqQuery[key]);
-        settings.sort._id = 1;
-      } else if (action === 'skip') {
-        settings.skip = Number(reqQuery[key]);
-      } else if (action === 'limit') {
-        settings.limit = Number(reqQuery[key]);
-      } else if (action === 'filter') {
-        if (!operator) {
-          if (/^true|^false/i.test(reqQuery[key])) {
-            settings.filter[field] = /^true$/i.test(reqQuery[key]);
-          } else {
-            settings.filter[field] = { $regex: new RegExp(reqQuery[key], 'i') };
-          }
-        } else {
-          const $operator = '$' + operator;
-          if (operator === 'in' || operator === 'all') {
-            settings.filter[field] = { [$operator]: reqQuery[key].split('_') };
-          } else if (!settings.filter[field]) {
-            settings.filter[field] = { [$operator]: Number(reqQuery[key]) };
-          } else {
-            settings.filter[field][$operator] = Number(reqQuery[key]);
-          }
+    const settings = {
+        filter: {},
+        sort: {},
+        skip: 0,
+        limit: 20
+    }
+    for (const key in reqQuery) {
+        const [action, field, operator] = key.split('_');
+        const value = reqQuery[key];
+        
+        if(action === 'sort') {
+            settings.sort[field] = Number(value);
+            settings.sort._id = 1;
+        }else if(action === 'skip'){
+          settings.skip = Number(reqQuery[key]);
+        }else if(action === 'limit'){
+          settings.limit = Number(reqQuery[key]);
+        }else if(action === 'filter'){
+            if(!operator){
+                if(field === 'isAnswered'){
+                    settings.filter[field] = value === 'true';
+                }else if(field === 'title'){
+                    settings.filter[field] = { $regex: new RegExp(value, 'i') };
+                }else if(field === 'tags'){
+                    if(Array.isArray(value)){
+                        settings.filter[field] = { $in: value };                 
+                    }else{
+                        settings.filter[field] = { $in: [value] };                 
+                    }
+                }else{
+                    settings.filter[field] = { $regex: new RegExp(value, 'i') };                    
+                }
+            }else{
+                const $operator = '$' + operator;
+                if(!settings.filter[field]){
+                    settings.filter[field] = { [$operator]: Number(value) };
+                }else{
+                    settings.filter[field][$operator] = Number(value);
+                }
+            }        
         }
-      }
-    });
-  }
-
-  return settings;
+    }
+    return settings;
 };
 
 export const addCountToDocuments = async (client, {

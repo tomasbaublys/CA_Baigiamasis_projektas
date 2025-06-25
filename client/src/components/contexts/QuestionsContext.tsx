@@ -6,6 +6,7 @@ import {
   QuestionsReducerActionTypes,
   QuestionsFilterValues,
 } from '../../types.ts';
+import { sortQuestions } from '../../utils/sortHelpers.ts';
 
 const QuestionsContext = createContext<QuestionsContextTypes | undefined>(undefined);
 
@@ -46,7 +47,8 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     try {
       const res = await fetch(url);
       const data: Question[] = await res.json();
-      dispatch({ type: 'setQuestions', questionData: data });
+      const sorted = sortQuestions(data, sortQueryRef.current);
+      dispatch({ type: 'setQuestions', questionData: sorted });
     } catch (err) {
       console.error('Failed to fetch questions:', err);
     } finally {
@@ -69,10 +71,10 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
       sortQueryRef.current = 'sort_createdAt=1';
     } else if (sortValue === 'dateDesc') {
       sortQueryRef.current = 'sort_createdAt=-1';
-    } else if (sortValue === 'scoreAsc') {
-      sortQueryRef.current = 'sort_score=1';
-    } else if (sortValue === 'scoreDesc') {
-      sortQueryRef.current = 'sort_score=-1';
+    } else if (sortValue === 'answersAsc') {
+      sortQueryRef.current = 'sort_answersCount=1';
+    } else if (sortValue === 'answersDesc') {
+      sortQueryRef.current = 'sort_answersCount=-1';
     } else {
       sortQueryRef.current = '';
     }
@@ -83,12 +85,21 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
 
   const applyFilter = (values: QuestionsFilterValues) => {
     const filters: string[] = [];
+
     if (values.title) {
       filters.push(`filter_title=${encodeURIComponent(values.title)}`);
     }
-    if (values.tag) {
-      filters.push(`filter_tag=${encodeURIComponent(values.tag)}`);
+
+    values.tags?.forEach(tag => {
+      filters.push(`filter_tag=${encodeURIComponent(tag)}`);
+    });
+
+    if (values.isAnswered === true) {
+      filters.push(`filter_isAnswered=true`);
+    } else if (values.isAnswered === false) {
+      filters.push(`filter_isAnswered=false`);
     }
+
     filterQueryRef.current = filters.join('&');
     currentPageRef.current = 1;
     getFilteredDataAmount();

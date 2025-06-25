@@ -50,6 +50,7 @@ const createQuestion = async (req, res) => {
         username: user.username,
         profilePicture: user.profilePicture || ''
       },
+      isAnswered: false,
       score: 0,
       likes: [],
       dislikes: [],
