@@ -1,7 +1,6 @@
 import { v4 as generateID, validate as uuidValidate } from 'uuid';
 import { connectDB } from './helper.js';
 
-// POST NEW ANSWER (POST /questions/:id/answers)
 const postAnswer = async (req, res) => {
   const questionId = req.params.id;
   const { content } = req.body;
@@ -45,7 +44,6 @@ const postAnswer = async (req, res) => {
   }
 };
 
-// GET ANSWERS FOR A QUESTION (GET /questions/:id/answers)
 const getAnswersByQuestionId = async (req, res) => {
   const questionId = req.params.id;
 
@@ -72,7 +70,6 @@ const getAnswersByQuestionId = async (req, res) => {
   }
 };
 
-// EDIT ANSWER (PATCH /answers/:id)
 const editAnswer = async (req, res) => {
   const answerId = req.params.id;
   const { content } = req.body;
@@ -121,7 +118,6 @@ const editAnswer = async (req, res) => {
   }
 };
 
-// DELETE ANSWER (DELETE /answers/:id)
 const deleteAnswer = async (req, res) => {
   const answerId = req.params.id;
   const user = req.user;
