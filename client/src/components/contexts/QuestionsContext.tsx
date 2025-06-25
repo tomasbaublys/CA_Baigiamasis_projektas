@@ -85,12 +85,21 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
 
   const applyFilter = (values: QuestionsFilterValues) => {
     const filters: string[] = [];
+
     if (values.title) {
       filters.push(`filter_title=${encodeURIComponent(values.title)}`);
     }
-    if (values.tag) {
-      filters.push(`filter_tag=${encodeURIComponent(values.tag)}`);
+
+    values.tags?.forEach(tag => {
+      filters.push(`filter_tag=${encodeURIComponent(tag)}`);
+    });
+
+    if (values.isAnswered === true) {
+      filters.push(`filter_isAnswered=true`);
+    } else if (values.isAnswered === false) {
+      filters.push(`filter_isAnswered=false`);
     }
+
     filterQueryRef.current = filters.join('&');
     currentPageRef.current = 1;
     getFilteredDataAmount();

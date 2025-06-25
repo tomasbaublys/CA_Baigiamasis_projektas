@@ -108,7 +108,33 @@ export type QuestionsContextTypes = {
 
 export type QuestionsFilterValues = {
   title?: string;
-  tag?: string;
-  createdAt_gte: string;
-  createdAt_lte: string;
+  tags?: string[];
+  isAnswered?: boolean;
 };
+
+
+export type Answer = {
+  _id: string;
+  questionId: string;
+  userId: string;
+  username: string;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  edited: boolean;
+};
+
+export type AnswersReducerActionTypes =
+  | { type: 'setAnswers'; answers: Answer[] }
+  | { type: 'addAnswer'; answer: Answer }
+  | { type: 'updateAnswer'; answer: Answer }
+  | { type: 'deleteAnswer'; id: string };
+
+export type AnswersContextTypes = {
+  answers: Answer[];
+  getAnswersByQuestionId: (questionId: string) => Promise<void>;
+  postAnswer: (questionId: string, content: string) => Promise<void>;
+  editAnswer: (answerId: string, content: string) => Promise<void>;
+  deleteAnswer: (answerId: string) => Promise<void>;
+  dispatch: React.Dispatch<AnswersReducerActionTypes>;
+}

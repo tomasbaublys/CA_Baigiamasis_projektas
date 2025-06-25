@@ -34,6 +34,12 @@ const postAnswer = async (req, res) => {
     };
 
     await client.db('Forum').collection('answers').insertOne(newAnswer);
+
+    await questions.updateOne(
+      { _id: questionId },
+      { $set: { isAnswered: true } }
+    );
+
     res.status(201).send({ success: 'Answer posted successfully.', answerData: newAnswer });
 
   } catch (err) {
@@ -128,7 +134,10 @@ const deleteAnswer = async (req, res) => {
 
   const client = await connectDB();
   try {
-    const answers = client.db('Forum').collection('answers');
+    const db = client.db('Forum');
+    const answers = db.collection('answers');
+    const questions = db.collection('questions');
+
     const answer = await answers.findOne({ _id: answerId });
 
     if (!answer) {
@@ -139,7 +148,20 @@ const deleteAnswer = async (req, res) => {
       return res.status(403).send({ error: 'You are not allowed to delete this answer.' });
     }
 
+    // Delete the answer
     await answers.deleteOne({ _id: answerId });
+
+    // Check if any answers remain for the same question
+    const remainingAnswersCount = await answers.countDocuments({ questionId: answer.questionId });
+
+    // If no more answers, update isAnswered to false
+    if (remainingAnswersCount === 0) {
+      await questions.updateOne(
+        { _id: answer.questionId },
+        { $set: { isAnswered: false } }
+      );
+    }
+
     res.send({ success: 'Answer deleted successfully.' });
 
   } catch (err) {
