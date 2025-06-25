@@ -10,13 +10,14 @@ import UsersContext from '../../contexts/UsersContext';
 import { AnswersContextTypes, UsersContextTypes } from '../../../types';
 
 const FormWrapper = styled.div`
-  margin-top: 3rem;
-  padding: 2rem;
-  background-color: #1a1a1a;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background-color: #1f1f1f;
   border: 1px solid #333;
   border-radius: 8px;
 
   textarea {
+    width: 100%;
     background-color: #2a2a2a;
     color: white;
     border: 1px solid #444;
@@ -25,10 +26,6 @@ const FormWrapper = styled.div`
     font-size: 1rem;
     resize: vertical;
 
-    &::placeholder {
-      color: #999;
-    }
-
     &:focus {
       outline: none;
       border-color: #f5c518;
@@ -36,8 +33,9 @@ const FormWrapper = styled.div`
   }
 `;
 
-const Heading = styled.h3`
-  color: #f5c518;
+const Heading = styled.h2`
+  font-size: 20px;
+  color: white;
   margin-bottom: 1rem;
 `;
 
@@ -80,7 +78,7 @@ const AddAnswer = () => {
       <Heading>Post Your Answer</Heading>
       <form onSubmit={formik.handleSubmit}>
         <InputField
-          labelText="" // Label removed
+          labelText=""
           inputType="text"
           inputName="content"
           inputId="content"
@@ -89,7 +87,6 @@ const AddAnswer = () => {
           inputOnBlur={formik.handleBlur}
           errors={formik.errors.content}
           touched={formik.touched.content}
-          inputPlaceholder="Write your answer..."
           as="textarea"
           rows={5}
         />

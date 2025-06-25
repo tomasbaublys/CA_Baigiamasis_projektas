@@ -10,17 +10,25 @@ const AnswerWrapper = styled.div`
   border: 1px solid #333;
   border-radius: 8px;
   margin-bottom: 1rem;
+  max-width: 85%;
+  margin-left: auto;
 `;
 
-const Username = styled.p`
-  font-weight: bold;
-  color: #f5c518;
-  margin-bottom: 0.3rem;
-`;
-
-const DateText = styled.span`
-  font-size: 0.8rem;
+const MetaLine = styled.p`
+  font-size: 0.9rem;
   color: #aaa;
+  margin-bottom: 0.5rem;
+
+  span.username {
+    color: #f5c518;
+    font-weight: bold;
+  }
+
+  span.edited {
+    font-size: 0.8rem;
+    color: #999;
+    margin-left: 0.4rem;
+  }
 `;
 
 const Content = styled.p`
@@ -29,39 +37,21 @@ const Content = styled.p`
   white-space: pre-wrap;
 `;
 
-const EditedBadge = styled.span`
-  font-size: 0.75rem;
-  color: #999;
-  margin-left: 0.5rem;
-`;
-
-const EditButton = styled.button`
-  margin-top: 0.5rem;
-  background-color: transparent;
-  border: 1px solid #f5c518;
+const EditLink = styled.span`
   color: #f5c518;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  border-radius: 4px;
+  font-size: 0.85rem;
   cursor: pointer;
   &:hover {
-    background-color: #f5c518;
-    color: #1f1f1f;
+    opacity: 0.8;
   }
 `;
 
-const DeleteButton = styled.button`
-  margin-top: 0.5rem;
-  background-color: transparent;
-  border: 1px solid #f56262;
+const DeleteLink = styled.span`
   color: #f56262;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  border-radius: 4px;
+  font-size: 0.85rem;
   cursor: pointer;
   &:hover {
-    background-color: #f56262;
-    color: #1f1f1f;
+    opacity: 0.8;
   }
 `;
 
@@ -79,7 +69,7 @@ const Textarea = styled.textarea`
 const ActionButtons = styled.div`
   margin-top: 0.5rem;
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
 `;
 
 const SaveButton = styled.button`
@@ -150,10 +140,10 @@ const AnswerCard = ({ answer }: { answer: Answer }) => {
 
   return (
     <AnswerWrapper>
-      <Username>
-        {answer.username} <DateText>{formattedDate}</DateText>
-        {answer.edited && <EditedBadge>(edited)</EditedBadge>}
-      </Username>
+      <MetaLine>
+        Answered by <span className="username">{answer.username}</span> · {formattedDate}
+        {answer.edited && <span className="edited">(edited)</span>}
+      </MetaLine>
 
       {isEditing ? (
         <>
@@ -175,8 +165,8 @@ const AnswerCard = ({ answer }: { answer: Answer }) => {
         <>
           {!showConfirm ? (
             <ActionButtons>
-              <EditButton onClick={() => setIsEditing(true)}>Edit</EditButton>
-              <DeleteButton onClick={() => setShowConfirm(true)}>Delete</DeleteButton>
+              <EditLink onClick={() => setIsEditing(true)}>Edit answer</EditLink>
+              <DeleteLink onClick={() => setShowConfirm(true)}>Delete answer</DeleteLink>
             </ActionButtons>
           ) : (
             <DeleteWarning>

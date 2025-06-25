@@ -5,7 +5,9 @@ import {
   getQuestionById,
   updateQuestion,
   deleteQuestion,
-  getQuestionsCount
+  getQuestionsCount,
+  likeQuestion,
+  dislikeQuestion
 } from '../controllers/questionsController.js';
 import { authenticateToken } from '../middleware/auth.js';
 
@@ -17,7 +19,7 @@ router.get('/getCount', getQuestionsCount);
 router.get('/:id', getQuestionById);
 router.patch('/:id', authenticateToken, updateQuestion);
 router.delete('/:id', authenticateToken, deleteQuestion);
-// router.patch('/like/:id', authenticateToken, likeQuestion);
-// router.patch('/dislike/:id', authenticateToken, dislikeQuestion);
+router.patch('/like/:id', authenticateToken, likeQuestion);
+router.patch('/dislike/:id', authenticateToken, dislikeQuestion);
 
 export default router;
