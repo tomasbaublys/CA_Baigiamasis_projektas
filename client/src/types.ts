@@ -48,7 +48,6 @@ export type EditableUser = Omit<User, '_id' | 'createdAt' | 'password'> & {
 };
 
 export type FormInputProps = {
-  labelHtmlFor: string;
   labelText: string;
   inputType: string;
   inputName: string;
@@ -89,7 +88,7 @@ export type QuestionsContextTypes = {
   applyFilter: (values: QuestionsFilterValues) => void;
   resetFilters: () => void;
   loading: boolean;
-  fetchQuestions: () => Promise<void>; 
+  fetchQuestions: () => Promise<void>;
   createQuestion: (
     questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
   ) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
@@ -100,6 +99,11 @@ export type QuestionsContextTypes = {
   ) => Promise<{ error: string } | { success: string }>;
   deleteQuestion: (id: string) => Promise<{ success?: string; error?: string }>;
   dispatch: React.Dispatch<QuestionsReducerActionTypes>;
+  filteredDataAmount: number;
+  currentPage: React.RefObject<number>;
+  pageSize: React.RefObject<number>;
+  changePage: (newPage: number) => void;
+  changePageSize: (size: number) => void;
 };
 
 export type QuestionsFilterValues = {
@@ -107,30 +111,4 @@ export type QuestionsFilterValues = {
   tag?: string;
   createdAt_gte: string;
   createdAt_lte: string;
-};
-
-export type Answer = {
-  _id: string;
-  questionId: string;
-  userId: string;
-  username: string;
-  content: string;
-  createdAt: string;
-  updatedAt: string;
-  edited: boolean;
-};
-
-export type AnswersReducerActionTypes =
-  | { type: 'setAnswers'; answers: Answer[] }
-  | { type: 'addAnswer'; answer: Answer }
-  | { type: 'updateAnswer'; answer: Answer }
-  | { type: 'deleteAnswer'; id: string };
-
-export type AnswersContextTypes = {
-  answers: Answer[];
-  getAnswersByQuestionId: (questionId: string) => Promise<void>;
-  postAnswer: (questionId: string, content: string) => Promise<void>;
-  editAnswer: (answerId: string, content: string) => Promise<void>;
-  deleteAnswer: (answerId: string) => Promise<void>;
-  dispatch: React.Dispatch<AnswersReducerActionTypes>;
 };

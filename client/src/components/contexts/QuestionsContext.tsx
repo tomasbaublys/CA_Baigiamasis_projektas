@@ -24,84 +24,97 @@ const reducer = (state: Question[], action: QuestionsReducerActionTypes): Questi
 const QuestionsProvider = ({ children }: ChildrenProp) => {
   const [questions, dispatch] = useReducer(reducer, []);
   const [loading, setLoading] = useState(true);
+  const [filteredDataAmount, setFilteredDataAmount] = useState(0);
 
   const filterQueryRef = useRef('');
   const sortQueryRef = useRef('');
+  const currentPageRef = useRef(1);
+  const pageSizeRef = useRef(4);
 
-const fetchQuestions = async (): Promise<void> => {
-  setLoading(true);
+  const fetchQuestions = async (): Promise<void> => {
+    setLoading(true);
+    const skip = (currentPageRef.current - 1) * pageSizeRef.current;
+    const query = [
+      `skip=${skip}`,
+      `limit=${pageSizeRef.current}`,
+      filterQueryRef.current,
+      sortQueryRef.current
+    ].filter(Boolean).join('&');
 
-  const query = [filterQueryRef.current, sortQueryRef.current]
-    .filter(Boolean)
-    .join('&');
+    const url = `http://localhost:5500/questions?${query}`;
 
-  const url = `http://localhost:5500/questions${query ? `?${query}` : ''}`;
-
-  try {
-    const res = await fetch(url);
-    const data: Question[] = await res.json();
-
-    // Manual frontend sort for answersCount
-    if (sortQueryRef.current.includes('sort_answersCount')) {
-      const sortOrder = sortQueryRef.current.endsWith('=1') ? 1 : -1;
-      data.sort((a, b) => {
-        const aCount = a.answersCount ?? 0;
-        const bCount = b.answersCount ?? 0;
-        return sortOrder * (aCount - bCount);
-      });
+    try {
+      const res = await fetch(url);
+      const data: Question[] = await res.json();
+      dispatch({ type: 'setQuestions', questionData: data });
+    } catch (err) {
+      console.error('Failed to fetch questions:', err);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    dispatch({ type: 'setQuestions', questionData: data });
-  } catch (err) {
-    console.error('Failed to fetch questions:', err);
-  } finally {
-    setLoading(false);
-  }
-};
+  const getFilteredDataAmount = async () => {
+    try {
+      const res = await fetch(`http://localhost:5500/questions/getCount?${filterQueryRef.current}`);
+      const data = await res.json();
+      setFilteredDataAmount(data.totalAmount);
+    } catch (err) {
+      console.error('Failed to get question count:', err);
+    }
+  };
 
-  const applySort = (sortValue: string) => {
+  const changeSort = (sortValue: string) => {
     if (sortValue === 'dateAsc') {
       sortQueryRef.current = 'sort_createdAt=1';
     } else if (sortValue === 'dateDesc') {
       sortQueryRef.current = 'sort_createdAt=-1';
-    } else if (sortValue === 'answersAsc') {
-      sortQueryRef.current = 'sort_answersCount=1';
-    } else if (sortValue === 'answersDesc') {
-      sortQueryRef.current = 'sort_answersCount=-1';
+    } else if (sortValue === 'scoreAsc') {
+      sortQueryRef.current = 'sort_score=1';
+    } else if (sortValue === 'scoreDesc') {
+      sortQueryRef.current = 'sort_score=-1';
     } else {
       sortQueryRef.current = '';
     }
-
+    currentPageRef.current = 1;
+    getFilteredDataAmount();
     fetchQuestions();
   };
 
   const applyFilter = (values: QuestionsFilterValues) => {
     const filters: string[] = [];
-
     if (values.title) {
       filters.push(`filter_title=${encodeURIComponent(values.title)}`);
     }
-
     if (values.tag) {
       filters.push(`filter_tag=${encodeURIComponent(values.tag)}`);
     }
-
     filterQueryRef.current = filters.join('&');
+    currentPageRef.current = 1;
+    getFilteredDataAmount();
+    fetchQuestions();
+  };
+
+  const changePageSize = (size: number) => {
+    pageSizeRef.current = size;
+    currentPageRef.current = 1;
+    fetchQuestions();
+  };
+
+  const changePage = (page: number) => {
+    currentPageRef.current = page;
     fetchQuestions();
   };
 
   const resetFilters = () => {
     filterQueryRef.current = '';
+    currentPageRef.current = 1;
     fetchQuestions();
   };
 
   const createQuestion: QuestionsContextTypes['createQuestion'] = async (questionData) => {
-    const token =
-      localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-
-    if (!token) {
-      return { error: 'Unauthorized. Please log in.' };
-    }
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!token) return { error: 'Unauthorized. Please log in.' };
 
     try {
       const res = await fetch('http://localhost:5500/questions', {
@@ -114,31 +127,21 @@ const fetchQuestions = async (): Promise<void> => {
       });
 
       const data = await res.json();
-
       if (!res.ok || !data.questionData || !data.questionData._id) {
         return { error: data.error || 'Failed to create question.' };
       }
 
       dispatch({ type: 'addQuestion', questionData: data.questionData });
-      return {
-        success: 'Question created successfully.',
-        newQuestionId: data.questionData._id,
-      };
+      return { success: 'Question created successfully.', newQuestionId: data.questionData._id };
     } catch (error) {
       console.error('Error creating question:', error);
       return { error: 'Something went wrong. Please try again.' };
     }
   };
-  const editQuestion: QuestionsContextTypes['editQuestion'] = async (
-    id,
-    updatedFields
-  ) => {
-    const token =
-      localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
-    if (!token) {
-      return { error: 'Unauthorized. Please log in.' };
-    }
+  const editQuestion: QuestionsContextTypes['editQuestion'] = async (id, updatedFields) => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!token) return { error: 'Unauthorized. Please log in.' };
 
     try {
       const res = await fetch(`http://localhost:5500/questions/${id}`, {
@@ -151,7 +154,6 @@ const fetchQuestions = async (): Promise<void> => {
       });
 
       const data = await res.json();
-
       if (!res.ok || !data.success) {
         return { error: data.error || 'Failed to update question.' };
       }
@@ -165,10 +167,7 @@ const fetchQuestions = async (): Promise<void> => {
 
   const deleteQuestion = async (id: string) => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-
-    if (!token) {
-      return { error: 'Unauthorized. Please log in.' };
-    }
+    if (!token) return { error: 'Unauthorized. Please log in.' };
 
     try {
       const res = await fetch(`http://localhost:5500/questions/${id}`, {
@@ -204,22 +203,28 @@ const fetchQuestions = async (): Promise<void> => {
 
   useEffect(() => {
     fetchQuestions();
+    getFilteredDataAmount();
   }, []);
 
   return (
     <QuestionsContext.Provider
       value={{
         questions,
-        applySort,
+        loading,
+        filteredDataAmount,
+        changePage,
+        changePageSize,
+        applySort: changeSort,
         applyFilter,
         resetFilters,
-        loading,
         fetchQuestions,
         createQuestion,
         editQuestion,
         deleteQuestion,
         dispatch,
-        getQuestionById
+        getQuestionById,
+        currentPage: currentPageRef,
+        pageSize: pageSizeRef,
       }}
     >
       {children}
