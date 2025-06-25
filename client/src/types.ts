@@ -48,6 +48,7 @@ export type EditableUser = Omit<User, '_id' | 'createdAt' | 'password'> & {
 };
 
 export type FormInputProps = {
+  labelHtmlFor: string;
   labelText: string;
   inputType: string;
   inputName: string;

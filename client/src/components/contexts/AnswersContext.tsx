@@ -32,7 +32,7 @@ const AnswersProvider = ({ children }: ChildrenProp) => {
   };
 
   const postAnswer = async (questionId: string, content: string) => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     try {
       const res = await fetch(`http://localhost:5500/questions/${questionId}/answers`, {
         method: 'POST',

@@ -1,14 +1,13 @@
 import { FormInputProps } from '../../../types';
 import Input from '../atoms/Input';
 import Label from '../atoms/Label';
+import Textarea from '../atoms/Textarea';
 
 type Props = Omit<FormInputProps, 'labelHtmlFor'> & {
-  inputOnChange: (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => void;
-  inputOnBlur: (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => void;
+  inputOnChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  inputOnBlur: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  as?: 'input' | 'textarea';
+  rows?: number;
 };
 
 const InputField = ({
@@ -22,11 +21,23 @@ const InputField = ({
   errors,
   touched,
   inputPlaceholder,
+  as = 'input',
+  rows,
 }: Props) => {
   return (
     <div>
-      <div>
-        <Label labelHtmlFor={inputId} labelText={labelText} />
+      <Label labelHtmlFor={inputId} labelText={labelText} />
+      {as === 'textarea' ? (
+        <Textarea
+          name={inputName}
+          id={inputId}
+          value={inputValue}
+          onChange={inputOnChange}
+          onBlur={inputOnBlur}
+          placeholder={inputPlaceholder}
+          rows={rows}
+        />
+      ) : (
         <Input
           inputType={inputType}
           inputName={inputName}
@@ -36,7 +47,7 @@ const InputField = ({
           inputOnBlur={inputOnBlur}
           inputPlaceholder={inputPlaceholder}
         />
-      </div>
+      )}
       {errors && touched && <p className="error">{errors}</p>}
     </div>
   );
