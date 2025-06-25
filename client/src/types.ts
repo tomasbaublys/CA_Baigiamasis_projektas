@@ -75,6 +75,7 @@ export type Question = {
   score: number;
   createdAt: string;
   updatedAt: string;
+  answersCount?: number;
 };
 
 export type QuestionsReducerActionTypes =

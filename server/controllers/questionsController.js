@@ -226,10 +226,29 @@ const deleteQuestion = async (req, res) => {
   }
 };
 
+const getQuestionsCount = async (req, res) => {
+  const client = await connectDB();
+  try {
+    const settings = dynamicQuery(req.query); // reuse filters
+    const totalAmount = await client
+      .db('Forum')
+      .collection('questions')
+      .countDocuments(settings.filter);
+
+    res.send({ totalAmount });
+  } catch (err) {
+    console.error('getQuestionsCount error:', err);
+    res.status(500).send({ error: `Server error. ${err}` });
+  } finally {
+    await client.close();
+  }
+};
+
 export {
   createQuestion,
   getAllQuestions,
   getQuestionById,
   updateQuestion,
-  deleteQuestion
+  deleteQuestion,
+  getQuestionsCount
 };

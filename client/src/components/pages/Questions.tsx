@@ -4,9 +4,9 @@ import { useLocation, Link } from 'react-router';
 import QuestionsContext from '../../components/contexts/QuestionsContext.tsx';
 import QuestionFilter from '../UI/molecules/QuestionFilter';
 import QuestionSort from '../UI/molecules/QuestionSort';
+import QuestionsPagination from '../UI/molecules/QuestionsPagination';
 import type { Question } from '../../types';
 
-// Styled-components
 const PageWrapper = styled.div`
   max-width: 1200px;
   margin: 0 auto;
@@ -111,7 +111,6 @@ const Questions = () => {
     if (location.pathname === '/questions') {
       fetchQuestions();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   return (
@@ -130,21 +129,24 @@ const Questions = () => {
           {loading ? (
             <Message>Loading questions...</Message>
           ) : questions.length > 0 ? (
-            <QuestionList>
-              {questions.map((question: Question) => (
-                <QuestionCard key={question._id}>
-                  <QuestionTitle>
-                    <Link to={`/questions/${question._id}`}>{question.title}</Link>
-                  </QuestionTitle>
-                  <Description>{question.description}</Description>
-                  <Meta>
-                    <Author>👤 {question.author.username}</Author>
-                    <span>💬 {question.answersCount ?? 0} answers</span>
-                    <CreatedAt>{new Date(question.createdAt).toLocaleDateString()}</CreatedAt>
-                  </Meta>
-                </QuestionCard>
-              ))}
-            </QuestionList>
+            <>
+              <QuestionList>
+                {questions.map((question: Question) => (
+                  <QuestionCard key={question._id}>
+                    <QuestionTitle>
+                      <Link to={`/questions/${question._id}`}>{question.title}</Link>
+                    </QuestionTitle>
+                    <Description>{question.description}</Description>
+                    <Meta>
+                      <Author>👤 {question.author.username}</Author>
+                      <span>💬 {question.answersCount ?? 0} answers</span>
+                      <CreatedAt>{new Date(question.createdAt).toLocaleDateString()}</CreatedAt>
+                    </Meta>
+                  </QuestionCard>
+                ))}
+              </QuestionList>
+              <QuestionsPagination />
+            </>
           ) : (
             <Message>No questions found...</Message>
           )}
