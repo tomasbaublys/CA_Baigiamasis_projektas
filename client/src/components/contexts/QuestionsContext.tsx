@@ -6,6 +6,7 @@ import {
   QuestionsReducerActionTypes,
   QuestionsFilterValues,
 } from '../../types.ts';
+import { sortQuestions } from '../../utils/sortHelpers.ts';
 
 const QuestionsContext = createContext<QuestionsContextTypes | undefined>(undefined);
 
@@ -46,7 +47,8 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     try {
       const res = await fetch(url);
       const data: Question[] = await res.json();
-      dispatch({ type: 'setQuestions', questionData: data });
+      const sorted = sortQuestions(data, sortQueryRef.current);
+      dispatch({ type: 'setQuestions', questionData: sorted });
     } catch (err) {
       console.error('Failed to fetch questions:', err);
     } finally {
@@ -69,10 +71,10 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
       sortQueryRef.current = 'sort_createdAt=1';
     } else if (sortValue === 'dateDesc') {
       sortQueryRef.current = 'sort_createdAt=-1';
-    } else if (sortValue === 'scoreAsc') {
-      sortQueryRef.current = 'sort_score=1';
-    } else if (sortValue === 'scoreDesc') {
-      sortQueryRef.current = 'sort_score=-1';
+    } else if (sortValue === 'answersAsc') {
+      sortQueryRef.current = 'sort_answersCount=1';
+    } else if (sortValue === 'answersDesc') {
+      sortQueryRef.current = 'sort_answersCount=-1';
     } else {
       sortQueryRef.current = '';
     }

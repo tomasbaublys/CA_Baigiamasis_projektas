@@ -111,6 +111,7 @@ const Questions = () => {
     if (location.pathname === '/questions') {
       fetchQuestions();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   return (
