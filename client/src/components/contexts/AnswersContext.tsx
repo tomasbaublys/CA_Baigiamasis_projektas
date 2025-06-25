@@ -52,7 +52,7 @@ const AnswersProvider = ({ children }: ChildrenProp) => {
   };
 
   const editAnswer = async (answerId: string, content: string) => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     try {
       const res = await fetch(`http://localhost:5500/answers/${answerId}`, {
         method: 'PATCH',
@@ -72,7 +72,7 @@ const AnswersProvider = ({ children }: ChildrenProp) => {
   };
 
   const deleteAnswer = async (answerId: string) => {
-    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     try {
       const res = await fetch(`http://localhost:5500/answers/${answerId}`, {
         method: 'DELETE',
