@@ -28,42 +28,41 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const filterQueryRef = useRef('');
   const sortQueryRef = useRef('');
 
-  const fetchQuestions = async (): Promise<void> => {
-    setLoading(true);
+const fetchQuestions = async (): Promise<void> => {
+  setLoading(true);
 
-    const query = [filterQueryRef.current, sortQueryRef.current]
-      .filter(Boolean)
-      .join('&');
+  const query = [filterQueryRef.current, sortQueryRef.current]
+    .filter(Boolean)
+    .join('&');
 
-    const url = `http://localhost:5500/questions${query ? `?${query}` : ''}`;
+  const url = `http://localhost:5500/questions${query ? `?${query}` : ''}`;
 
-    try {
-      const res = await fetch(url);
-      const data: Question[] = await res.json();
-      dispatch({ type: 'setQuestions', questionData: data });
-    } catch (err) {
-      console.error('Failed to fetch questions:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-const applySort = (sortValue: string) => {
-  if (sortValue === 'dateAsc') {
-    sortQueryRef.current = 'sort_createdAt=1';
-  } else if (sortValue === 'dateDesc') {
-    sortQueryRef.current = 'sort_createdAt=-1';
-  } else if (sortValue === 'scoreAsc') {
-    sortQueryRef.current = 'sort_score=1';
-  } else if (sortValue === 'scoreDesc') {
-    sortQueryRef.current = 'sort_score=-1';
-  } else {
-    sortQueryRef.current = '';
+  try {
+    const res = await fetch(url);
+    const data: Question[] = await res.json();
+    dispatch({ type: 'setQuestions', questionData: data });
+  } catch (err) {
+    console.error('Failed to fetch questions:', err);
+  } finally {
+    setLoading(false);
   }
-
-  fetchQuestions();
 };
-  
+
+  const applySort = (sortValue: string) => {
+    if (sortValue === 'dateAsc') {
+      sortQueryRef.current = 'sort_createdAt=1';
+    } else if (sortValue === 'dateDesc') {
+      sortQueryRef.current = 'sort_createdAt=-1';
+    } else if (sortValue === 'scoreAsc') {
+      sortQueryRef.current = 'sort_score=1';
+    } else if (sortValue === 'scoreDesc') {
+      sortQueryRef.current = 'sort_score=-1';
+    } else {
+      sortQueryRef.current = '';
+    }
+
+    fetchQuestions();
+  };
 
   const applyFilter = (values: QuestionsFilterValues) => {
     const filters: string[] = [];
@@ -119,7 +118,6 @@ const applySort = (sortValue: string) => {
       return { error: 'Something went wrong. Please try again.' };
     }
   };
-
   const editQuestion: QuestionsContextTypes['editQuestion'] = async (
     id,
     updatedFields
@@ -154,28 +152,28 @@ const applySort = (sortValue: string) => {
     }
   };
 
-  const deleteQuestion = async (id: string) => {
-    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+const deleteQuestion = async (id: string) => {
+  const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
-    if (!token) {
-      return { error: 'Unauthorized. Please log in.' };
-    }
+  if (!token) {
+    return { error: 'Unauthorized. Please log in.' };
+  }
 
-    try {
-      const res = await fetch(`http://localhost:5500/questions/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    const res = await fetch(`http://localhost:5500/questions/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      const data = await res.json();
-      return data;
-    } catch (err) {
-      console.error('Delete error:', err);
-      return { error: 'Failed to delete question. Please try again later.' };
-    }
-  };
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.error('Delete error:', err);
+    return { error: 'Failed to delete question. Please try again later.' };
+  }
+};
 
   const getQuestionById = async (id: string): Promise<{ error: string } | { question: Question }> => {
     try {
@@ -210,7 +208,7 @@ const applySort = (sortValue: string) => {
         editQuestion,
         deleteQuestion,
         dispatch,
-        getQuestionById,
+        getQuestionById
       }}
     >
       {children}
