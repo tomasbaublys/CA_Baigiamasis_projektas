@@ -67,7 +67,7 @@ const Header = () => {
 
   return (
     <HeaderWrapper>
-      <Logo to="/">Forum</Logo>
+      <Logo to="/">Movies Forum</Logo>
       <Nav>
         <NavLink to="/questions">Questions</NavLink>
         {loggedInUser && <NavLink to="/ask">Ask Question</NavLink>}
