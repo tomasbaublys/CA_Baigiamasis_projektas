@@ -48,7 +48,6 @@ export type EditableUser = Omit<User, '_id' | 'createdAt' | 'password'> & {
 };
 
 export type FormInputProps = {
-  labelHtmlFor: string;
   labelText: string;
   inputType: string;
   inputName: string;
@@ -59,4 +58,51 @@ export type FormInputProps = {
   touched?: boolean;
   inputOnChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
   inputOnBlur?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
+};
+
+export type Question = {
+  _id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  author: {
+    _id: string;
+    username: string;
+    profilePicture: string;
+  };
+  likes: string[];
+  dislikes: string[];
+  score: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type QuestionsReducerActionTypes =
+  | { type: 'setQuestions'; questionData: Question[] }
+  | { type: 'addQuestion'; questionData: Question };
+
+export type QuestionsContextTypes = {
+  questions: Question[];
+  applySort: (value: string) => void;
+  applyFilter: (values: QuestionsFilterValues) => void;
+  resetFilters: () => void;
+  loading: boolean;
+  fetchQuestions: () => Promise<void>; 
+  createQuestion: (
+    questionData: Pick<Question, 'title' | 'description' | 'tags' | 'author'>
+  ) => Promise<{ error: string } | { success: string; newQuestionId: string }>;
+  getQuestionById: (id: string) => Promise<{ error: string } | { question: Question }>;
+  editQuestion: (
+    id: string,
+    updatedFields: Partial<Pick<Question, 'title' | 'description' | 'tags'>>
+  ) => Promise<{ error: string } | { success: string }>;
+  deleteQuestion: (id: string) => Promise<{ success?: string; error?: string }>;
+  dispatch: React.Dispatch<QuestionsReducerActionTypes>;
+};
+
+export type QuestionsFilterValues = {
+  title?: string;
+  tag?: string;
+  createdAt_gte: string;
+  createdAt_lte: string;
 };

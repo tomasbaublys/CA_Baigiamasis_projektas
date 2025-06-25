@@ -69,7 +69,7 @@ const Header = () => {
     <HeaderWrapper>
       <Logo to="/">Forum</Logo>
       <Nav>
-        <NavLink to="/">Home</NavLink>
+        <NavLink to="/questions">Questions</NavLink>
         {loggedInUser && <NavLink to="/ask">Ask Question</NavLink>}
 
         {loggedInUser ? (
