@@ -4,6 +4,7 @@ import 'dotenv/config';
 
 import usersRoutes from './routes/usersRoutes.js';
 import questionsRoutes from './routes/questionsRoutes.js';
+import answersRoutes from './routes/answersRoutes.js'; // ✅
 
 const PORT = process.env.PORT || 5501;
 
@@ -20,6 +21,8 @@ app.use(cors(corsOptions));
 
 app.use('/users', usersRoutes);
 app.use('/questions', questionsRoutes);
+app.use('/questions', answersRoutes);
+app.use('/answers', answersRoutes); 
 
 app.use((req, res) => {
   res.status(404).send({ error: 'Your requested route does not exist.' });
