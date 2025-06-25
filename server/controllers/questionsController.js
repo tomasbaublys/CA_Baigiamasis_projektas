@@ -84,6 +84,7 @@ const getAllQuestions = async (req, res) => {
       .limit(settings.limit)
       .toArray();
 
+    // Add answersCount
     const dataWithCount = await addCountToDocuments(client, {
       dbName: 'Forum',
       sourceDocs: data,
@@ -92,7 +93,13 @@ const getAllQuestions = async (req, res) => {
       countFieldName: 'answersCount'
     });
 
-    res.send(dataWithCount);
+    // Add score field to each question
+    const dataWithScores = dataWithCount.map(q => ({
+      ...q,
+      score: (q.likes?.length || 0) - (q.dislikes?.length || 0)
+    }));
+
+    res.send(dataWithScores);
   } catch (err) {
     console.error('getAllQuestions error:', err);
     res.status(500).send({ error: `Server error. ${err}` });
@@ -245,11 +252,97 @@ const getQuestionsCount = async (req, res) => {
   }
 };
 
+const likeQuestion = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user._id;
+
+  const client = await connectDB();
+  try {
+    const questions = client.db('Forum').collection('questions');
+    const question = await questions.findOne({ _id: id });
+
+    if (!question) return res.status(404).json({ error: 'Question not found' });
+
+    const likes = new Set(question.likes || []);
+    const dislikes = new Set(question.dislikes || []);
+
+    if (likes.has(userId)) {
+      likes.delete(userId); // remove like
+    } else {
+      likes.add(userId);
+      dislikes.delete(userId); // remove dislike if exists
+    }
+
+    await questions.updateOne(
+      { _id: id },
+      {
+        $set: {
+          likes: [...likes],
+          dislikes: [...dislikes],
+          score: [...likes].length - [...dislikes].length
+        }
+      }
+    );
+
+    const updated = await questions.findOne({ _id: id });
+    res.json(updated);
+  } catch (err) {
+    console.error('likeQuestion error:', err);
+    res.status(500).json({ error: 'Server error' });
+  } finally {
+    await client.close();
+  }
+};
+
+const dislikeQuestion = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user._id;
+
+  const client = await connectDB();
+  try {
+    const questions = client.db('Forum').collection('questions');
+    const question = await questions.findOne({ _id: id });
+
+    if (!question) return res.status(404).json({ error: 'Question not found' });
+
+    const likes = new Set(question.likes || []);
+    const dislikes = new Set(question.dislikes || []);
+
+    if (dislikes.has(userId)) {
+      dislikes.delete(userId); // remove dislike
+    } else {
+      dislikes.add(userId);
+      likes.delete(userId); // remove like if exists
+    }
+
+    await questions.updateOne(
+      { _id: id },
+      {
+        $set: {
+          likes: [...likes],
+          dislikes: [...dislikes],
+          score: [...likes].length - [...dislikes].length
+        }
+      }
+    );
+
+    const updated = await questions.findOne({ _id: id });
+    res.json(updated);
+  } catch (err) {
+    console.error('dislikeQuestion error:', err);
+    res.status(500).json({ error: 'Server error' });
+  } finally {
+    await client.close();
+  }
+};
+
 export {
   createQuestion,
   getAllQuestions,
   getQuestionById,
   updateQuestion,
   deleteQuestion,
-  getQuestionsCount
+  getQuestionsCount,
+  likeQuestion,
+  dislikeQuestion
 };

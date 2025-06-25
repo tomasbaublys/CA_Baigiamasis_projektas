@@ -212,6 +212,48 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     }
   };
 
+  const likeQuestion = async (id: string) => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!token) return { error: 'Unauthorized. Please log in.' };
+
+    try {
+      const res = await fetch(`http://localhost:5500/questions/like/${id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) return { error: data.error || 'Failed to like question.' };
+      return { updatedQuestion: data };
+    } catch (err) {
+      console.error('Like error:', err);
+      return { error: 'Something went wrong while liking.' };
+    }
+  };
+
+  const dislikeQuestion = async (id: string) => {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+    if (!token) return { error: 'Unauthorized. Please log in.' };
+
+    try {
+      const res = await fetch(`http://localhost:5500/questions/dislike/${id}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      if (!res.ok) return { error: data.error || 'Failed to dislike question.' };
+      return { updatedQuestion: data };
+    } catch (err) {
+      console.error('Dislike error:', err);
+      return { error: 'Something went wrong while disliking.' };
+    }
+  };
+
   useEffect(() => {
     fetchQuestions();
     getFilteredDataAmount();
@@ -234,6 +276,8 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
         deleteQuestion,
         dispatch,
         getQuestionById,
+        likeQuestion,
+        dislikeQuestion,
         currentPage: currentPageRef,
         pageSize: pageSizeRef,
       }}

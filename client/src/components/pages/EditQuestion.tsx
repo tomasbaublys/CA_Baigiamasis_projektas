@@ -10,29 +10,19 @@ import UsersContext from '../contexts/UsersContext.tsx';
 import { QuestionsContextTypes, UsersContextTypes } from '../../types.ts';
 import InputField from '../../components/UI/molecules/InputField.tsx';
 
-const PageWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+const Wrapper = styled.div`
+  padding: 2rem 1rem;
+  color: white;
+  max-width: 800px;
+  margin: 0 auto;
   background-color: #181818;
   min-height: 100vh;
-  padding: 3rem 1rem;
-  color: #fff;
-`;
-
-const Card = styled.div`
-  width: 320px;
-  background-color: #1f1f1f;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 20px 25px;
-  color: #fff;
 `;
 
 const Title = styled.h1`
-  font-size: 20px;
-  font-weight: 400;
-  margin-bottom: 24px;
+  font-size: 24px;
+  font-weight: normal;
+  margin-bottom: 2rem;
   text-align: center;
 `;
 
@@ -43,13 +33,14 @@ const StyledForm = styled.form`
 `;
 
 const StyledFieldWrapper = styled.div`
-  input, textarea {
+  input,
+  textarea {
     background-color: #2a2a2a;
     color: white;
     border: 1px solid #555;
     border-radius: 3px;
-    padding: 6px;
-    font-size: 12px;
+    padding: 8px;
+    font-size: 14px;
     width: 100%;
 
     &:focus {
@@ -64,7 +55,7 @@ const StyledFieldWrapper = styled.div`
   }
 
   label {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: bold;
     color: #ccc;
     display: block;
@@ -83,12 +74,12 @@ const SubmitButton = styled.button`
   border: none;
   border-radius: 20px;
   width: 100%;
-  padding: 8px 0;
-  font-size: 13px;
-  margin-top: 8px;
-  cursor: pointer;
+  padding: 10px 0;
+  font-size: 14px;
   font-weight: bold;
   color: #181818;
+  cursor: pointer;
+  margin-top: 12px;
 
   &:hover {
     background-color: #e2b33c;
@@ -144,7 +135,6 @@ const EditQuestion = () => {
       };
 
       const res = await editQuestion(id, updated);
-
       if ('success' in res) {
         navigate(`/questions/${id}`);
       }
@@ -152,57 +142,55 @@ const EditQuestion = () => {
   });
 
   return (
-    <PageWrapper>
-      <Card>
-        <Title>Edit Your Question</Title>
+    <Wrapper>
+      <Title>Edit Your Question</Title>
 
-        <StyledForm onSubmit={formik.handleSubmit}>
-          <StyledFieldWrapper>
-            <InputField
-              labelText="Title"
-              inputType="text"
-              inputName="title"
-              inputId="title"
-              inputValue={formik.values.title}
-              errors={formik.errors.title}
-              touched={formik.touched.title}
-              inputOnChange={formik.handleChange}
-              inputOnBlur={formik.handleBlur}
-            />
-          </StyledFieldWrapper>
+      <StyledForm onSubmit={formik.handleSubmit}>
+        <StyledFieldWrapper>
+          <InputField
+            labelText="Title"
+            inputType="text"
+            inputName="title"
+            inputId="title"
+            inputValue={formik.values.title}
+            errors={formik.errors.title}
+            touched={formik.touched.title}
+            inputOnChange={formik.handleChange}
+            inputOnBlur={formik.handleBlur}
+          />
+        </StyledFieldWrapper>
 
-          <StyledFieldWrapper>
-            <label htmlFor="description">Description</label>
-            <textarea
-              id="description"
-              name="description"
-              value={formik.values.description}
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-            />
-            {formik.errors.description && formik.touched.description && (
-              <p className="error">{formik.errors.description}</p>
-            )}
-          </StyledFieldWrapper>
+        <StyledFieldWrapper>
+          <label htmlFor="description">Description</label>
+          <textarea
+            id="description"
+            name="description"
+            value={formik.values.description}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+          />
+          {formik.errors.description && formik.touched.description && (
+            <p className="error">{formik.errors.description}</p>
+          )}
+        </StyledFieldWrapper>
 
-          <StyledFieldWrapper>
-            <InputField
-              labelText="Tags (comma separated)"
-              inputType="text"
-              inputName="tags"
-              inputId="tags"
-              inputValue={formik.values.tags}
-              errors={formik.errors.tags}
-              touched={formik.touched.tags}
-              inputOnChange={formik.handleChange}
-              inputOnBlur={formik.handleBlur}
-            />
-          </StyledFieldWrapper>
+        <StyledFieldWrapper>
+          <InputField
+            labelText="Tags (comma separated)"
+            inputType="text"
+            inputName="tags"
+            inputId="tags"
+            inputValue={formik.values.tags}
+            errors={formik.errors.tags}
+            touched={formik.touched.tags}
+            inputOnChange={formik.handleChange}
+            inputOnBlur={formik.handleBlur}
+          />
+        </StyledFieldWrapper>
 
-          <SubmitButton type="submit">Update Question</SubmitButton>
-        </StyledForm>
-      </Card>
-    </PageWrapper>
+        <SubmitButton type="submit">Update Question</SubmitButton>
+      </StyledForm>
+    </Wrapper>
   );
 };
 

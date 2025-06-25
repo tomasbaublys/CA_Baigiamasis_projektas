@@ -104,6 +104,8 @@ export type QuestionsContextTypes = {
   pageSize: React.RefObject<number>;
   changePage: (newPage: number) => void;
   changePageSize: (size: number) => void;
+  likeQuestion: (id: string) => Promise<{ error?: string; updatedQuestion?: Question }>;
+  dislikeQuestion: (id: string) => Promise<{ error?: string; updatedQuestion?: Question }>;
 };
 
 export type QuestionsFilterValues = {
