@@ -6,6 +6,8 @@ import QuestionFilter from '../UI/molecules/QuestionFilter';
 import QuestionSort from '../UI/molecules/QuestionSort';
 import QuestionsPagination from '../UI/molecules/QuestionsPagination';
 import type { Question } from '../../types';
+import Person from '@mui/icons-material/Person';
+import QuestionAnswer from '@mui/icons-material/QuestionAnswer';
 
 const PageWrapper = styled.div`
   max-width: 1200px;
@@ -92,6 +94,11 @@ const Meta = styled.div`
   font-size: 0.85rem;
   margin-top: 0.75rem;
   color: #999;
+
+  svg {
+    vertical-align: middle;
+    margin-right: 4px;
+  }
 `;
 
 const Author = styled.span``;
@@ -105,18 +112,18 @@ const Message = styled.p`
 
 const Questions = () => {
   const location = useLocation();
-  const { questions, loading, fetchQuestions } = useContext(QuestionsContext)!;
+  const { questions, loading, fetchQuestions, filteredDataAmount } = useContext(QuestionsContext)!;
 
   useEffect(() => {
     if (location.pathname === '/questions') {
       fetchQuestions();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   return (
     <PageWrapper>
-      <Title>All Questions ({questions.length})</Title>
+      <Title>All Questions ({filteredDataAmount})</Title>
       <PageLayout>
         <Sidebar>
           <h3>Filter</h3>
@@ -139,9 +146,17 @@ const Questions = () => {
                     </QuestionTitle>
                     <Description>{question.description}</Description>
                     <Meta>
-                      <Author>👤 {question.author.username}</Author>
-                      <span>💬 {question.answersCount ?? 0} answers</span>
-                      <CreatedAt>{new Date(question.createdAt).toLocaleDateString()}</CreatedAt>
+                      <Author>
+                        <Person fontSize="small" />
+                        {question.author.username}
+                      </Author>
+                      <span>
+                        <QuestionAnswer fontSize="small" />
+                        {question.answersCount ?? 0} answers
+                      </span>
+                      <CreatedAt>
+                        {new Date(question.createdAt).toLocaleDateString()}
+                      </CreatedAt>
                     </Meta>
                   </QuestionCard>
                 ))}
