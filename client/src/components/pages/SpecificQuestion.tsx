@@ -277,6 +277,11 @@ const SpecificQuestion = () => {
           <Meta>
             Asked by <strong>{question.author.username}</strong> •{' '}
             {new Date(question.createdAt).toLocaleString()}
+            {question.updatedAt !== question.createdAt && (
+              <span style={{ marginLeft: '8px', fontStyle: 'italic', color: '#888' }}>
+                (edited)
+              </span>
+            )}
           </Meta>
           <Body>{question.description}</Body>
 
