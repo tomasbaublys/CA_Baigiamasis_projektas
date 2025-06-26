@@ -71,6 +71,7 @@ const Header = () => {
       <Nav>
         <NavLink to="/questions">Questions</NavLink>
         {loggedInUser && <NavLink to="/ask">Ask Question</NavLink>}
+        {loggedInUser && <NavLink to="/activity">My Activity</NavLink>}
 
         {loggedInUser ? (
           <>
