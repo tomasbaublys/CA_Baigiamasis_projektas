@@ -2,7 +2,6 @@ import { useContext } from 'react';
 import styled from 'styled-components';
 import QuestionsContext from '../../contexts/QuestionsContext.tsx';
 
-// Styled components
 const PaginationBar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -19,9 +18,9 @@ const PaginationButtons = styled.div`
   gap: 6px;
 `;
 
-const PageButton = styled.button<{ active?: boolean }>`
-  background-color: ${({ active }) => (active ? '#f5c518' : '#2a2a2a')};
-  color: ${({ active }) => (active ? '#000' : '#fff')};
+const PageButton = styled.button<{ $active?: boolean }>`
+  background-color: ${({ $active }) => ($active ? '#f5c518' : '#2a2a2a')};
+  color: ${({ $active }) => ($active ? '#000' : '#fff')};
   border: 1px solid #444;
   border-radius: 6px;
   padding: 6px 12px;
@@ -30,7 +29,7 @@ const PageButton = styled.button<{ active?: boolean }>`
   min-width: 40px;
 
   &:hover {
-    background-color: ${({ active }) => (active ? '#e4b709' : '#444')};
+    background-color: ${({ $active }) => ($active ? '#e4b709' : '#444')};
   }
 
   &:disabled {
@@ -62,7 +61,8 @@ const QuestionsPagination = () => {
     changePageSize,
   } = useContext(QuestionsContext)!;
 
-  const lastPage = filteredDataAmount === 0 ? 1 : Math.ceil(filteredDataAmount / pageSize.current!);
+  const lastPage =
+    filteredDataAmount === 0 ? 1 : Math.ceil(filteredDataAmount / pageSize.current!);
 
   return (
     <PaginationBar>
@@ -75,7 +75,7 @@ const QuestionsPagination = () => {
           Array.from({ length: lastPage }, (_, i) => (
             <PageButton
               key={i + 1}
-              active={currentPage.current === i + 1}
+              $active={currentPage.current === i + 1}
               onClick={() => changePage(i + 1)}
             >
               {i + 1}
@@ -84,7 +84,7 @@ const QuestionsPagination = () => {
         ) : (
           <>
             <PageButton
-              active={currentPage.current === 1}
+              $active={currentPage.current === 1}
               onClick={() => changePage(1)}
             >
               1
@@ -99,7 +99,7 @@ const QuestionsPagination = () => {
             )}
 
             {currentPage.current !== 1 && currentPage.current !== lastPage && (
-              <PageButton active disabled>
+              <PageButton $active disabled>
                 {currentPage.current}
               </PageButton>
             )}
@@ -113,7 +113,7 @@ const QuestionsPagination = () => {
             {currentPage.current < lastPage - 2 && <PageButton disabled>...</PageButton>}
 
             <PageButton
-              active={currentPage.current === lastPage}
+              $active={currentPage.current === lastPage}
               onClick={() => changePage(lastPage)}
             >
               {lastPage}
@@ -143,9 +143,9 @@ const QuestionsPagination = () => {
           value={pageSize.current}
           onChange={(e) => changePageSize(Number(e.target.value))}
         >
-          <option value={4}>4</option>
-          <option value={8}>8</option>
-          <option value={12}>12</option>
+          <option value={10}>10</option>
+          <option value={20}>20</option>
+          <option value={30}>30</option>
         </Select>
       </div>
     </PaginationBar>

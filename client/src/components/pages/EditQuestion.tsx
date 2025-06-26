@@ -14,8 +14,6 @@ const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #181818;
-  min-height: 100vh;
   padding: 3rem 1rem;
   color: #fff;
 `;
