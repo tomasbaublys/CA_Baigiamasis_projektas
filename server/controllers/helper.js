@@ -28,7 +28,7 @@ export const dynamicQuery = (reqQuery) => {
         filter: {},
         sort: {},
         skip: 0,
-        limit: 20
+        limit: 100
     }
     for (const key in reqQuery) {
         const [action, field, operator] = key.split('_');

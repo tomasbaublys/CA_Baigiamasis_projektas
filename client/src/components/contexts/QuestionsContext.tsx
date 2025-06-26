@@ -118,6 +118,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const resetFilters = () => {
     filterQueryRef.current = '';
     currentPageRef.current = 1;
+    getFilteredDataAmount();
     fetchQuestions();
   };
 
@@ -240,8 +241,10 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   };
 
   useEffect(() => {
-    fetchQuestions();
-    getFilteredDataAmount();
+    const initFetch = async () => {
+      await Promise.all([getFilteredDataAmount(), fetchQuestions()]);
+    };
+    initFetch();
   }, []);
 
   return (

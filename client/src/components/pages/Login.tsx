@@ -139,7 +139,7 @@ const Login = () => {
         return;
       }
       setLoginMessage(response.success);
-      setTimeout(() => navigate('/'), 1800);
+      setTimeout(() => navigate('/questions'), 1800);
     }
   });
 
@@ -193,7 +193,7 @@ const Login = () => {
         </StyledForm>
 
         {loginMessage && (
-          <FooterText style={{ color: '#f5c518' }}>{loginMessage}</FooterText>
+          <FooterText style={{ color: '#d33737' }}>{loginMessage}</FooterText>
         )}
 
         <Divider />

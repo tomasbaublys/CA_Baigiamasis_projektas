@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router';
 import styled from 'styled-components';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 import { Question, QuestionsContextTypes, UsersContextTypes } from '../../types';
 import QuestionsContext from '../contexts/QuestionsContext';
@@ -90,11 +90,6 @@ const Score = styled.span`
   margin: 6px 0;
 `;
 
-const Error = styled.p`
-  color: #f56262;
-  font-weight: bold;
-`;
-
 const TextLink = styled(Link)`
   display: inline-block;
   margin-top: 1.5rem;
@@ -168,6 +163,21 @@ const CancelButton = styled.button`
   }
 `;
 
+const LoginPrompt = styled.p`
+  margin-top: 2rem;
+  font-size: 14px;
+  color: #aaa;
+
+  a {
+    color: #f5c518;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+`;
+
 const SpecificQuestion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -208,6 +218,12 @@ const SpecificQuestion = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
+  useEffect(() => {
+    if (error) {
+      navigate('/*', { replace: true });
+    }
+  }, [error, navigate]);
+
   const handleInitialDelete = () => {
     const hasAnswers = true;
     if (hasAnswers) {
@@ -244,14 +260,6 @@ const SpecificQuestion = () => {
     }
   };
 
-  if (error) {
-    return (
-      <Wrapper>
-        <Error>{error}</Error>
-      </Wrapper>
-    );
-  }
-
   if (!question) {
     return (
       <Wrapper>
@@ -265,11 +273,11 @@ const SpecificQuestion = () => {
       <QuestionCard>
         <VoteColumn>
           <CircleButton onClick={handleLike} disabled={!loggedInUser}>
-            <KeyboardArrowUpIcon />
+            <ArrowUpwardIcon />
           </CircleButton>
           <Score>{question.likes.length - question.dislikes.length}</Score>
           <CircleButton onClick={handleDislike} disabled={!loggedInUser}>
-            <KeyboardArrowDownIcon />
+            <ArrowDownwardIcon />
           </CircleButton>
         </VoteColumn>
         <Content>
@@ -314,7 +322,14 @@ const SpecificQuestion = () => {
       {answers.map(answer => (
         <AnswerCard key={answer._id} answer={answer} />
       ))}
-      <AddAnswer />
+
+      {loggedInUser ? (
+        <AddAnswer />
+      ) : (
+        <LoginPrompt>
+          You must <Link to="/login">log in</Link> to post an answer.
+        </LoginPrompt>
+      )}
     </Wrapper>
   );
 };

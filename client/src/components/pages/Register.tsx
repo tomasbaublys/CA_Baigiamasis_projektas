@@ -171,7 +171,7 @@ const Register = () => {
         return;
       }
       setRegisterMessage(response.success);
-      setTimeout(() => navigate('/'), 1800);
+      setTimeout(() => navigate('/questions'), 1800);
     }
   });
 
@@ -270,7 +270,7 @@ const Register = () => {
         </StyledForm>
 
         {registerMessage && (
-          <FooterText style={{ color: '#f5c518' }}>{registerMessage}</FooterText>
+          <FooterText style={{ color: '#f83e3e' }}>{registerMessage}</FooterText>
         )}
 
         <Divider />

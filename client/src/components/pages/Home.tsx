@@ -45,7 +45,8 @@ const Home = () => {
   useEffect(() => {
     resetFilters();
     fetchQuestions();
-  }, [resetFilters, fetchQuestions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Wrapper>
