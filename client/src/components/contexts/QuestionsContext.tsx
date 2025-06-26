@@ -30,7 +30,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const filterQueryRef = useRef('');
   const sortQueryRef = useRef('');
   const currentPageRef = useRef(1);
-  const pageSizeRef = useRef(4);
+  const pageSizeRef = useRef(10);
 
   const fetchQuestions = async (): Promise<void> => {
     setLoading(true);
@@ -89,11 +89,9 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     if (values.title) {
       filters.push(`filter_title=${encodeURIComponent(values.title)}`);
     }
-
     values.tags?.forEach(tag => {
       filters.push(`filter_tag=${encodeURIComponent(tag)}`);
     });
-
     if (values.isAnswered === true) {
       filters.push(`filter_isAnswered=true`);
     } else if (values.isAnswered === false) {
@@ -126,7 +124,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const createQuestion: QuestionsContextTypes['createQuestion'] = async (questionData) => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) return { error: 'Unauthorized. Please log in.' };
-
     try {
       const res = await fetch('http://localhost:5500/questions', {
         method: 'POST',
@@ -136,12 +133,10 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
         },
         body: JSON.stringify(questionData),
       });
-
       const data = await res.json();
       if (!res.ok || !data.questionData || !data.questionData._id) {
         return { error: data.error || 'Failed to create question.' };
       }
-
       dispatch({ type: 'addQuestion', questionData: data.questionData });
       return { success: 'Question created successfully.', newQuestionId: data.questionData._id };
     } catch (error) {
@@ -153,7 +148,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const editQuestion: QuestionsContextTypes['editQuestion'] = async (id, updatedFields) => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) return { error: 'Unauthorized. Please log in.' };
-
     try {
       const res = await fetch(`http://localhost:5500/questions/${id}`, {
         method: 'PATCH',
@@ -163,12 +157,10 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
         },
         body: JSON.stringify(updatedFields),
       });
-
       const data = await res.json();
       if (!res.ok || !data.success) {
         return { error: data.error || 'Failed to update question.' };
       }
-
       return { success: data.success };
     } catch (error) {
       console.error('Error editing question:', error);
@@ -179,7 +171,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const deleteQuestion = async (id: string) => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) return { error: 'Unauthorized. Please log in.' };
-
     try {
       const res = await fetch(`http://localhost:5500/questions/${id}`, {
         method: 'DELETE',
@@ -187,7 +178,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       const data = await res.json();
       return data;
     } catch (err) {
@@ -200,7 +190,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
     try {
       const res = await fetch(`http://localhost:5500/questions/${id}`);
       const data = await res.json();
-
       if (!res.ok || data.error) {
         return { error: data.error || 'Failed to fetch question.' };
       }
@@ -215,7 +204,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const likeQuestion = async (id: string) => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) return { error: 'Unauthorized. Please log in.' };
-
     try {
       const res = await fetch(`http://localhost:5500/questions/like/${id}`, {
         method: 'PATCH',
@@ -223,7 +211,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       const data = await res.json();
       if (!res.ok) return { error: data.error || 'Failed to like question.' };
       return { updatedQuestion: data };
@@ -236,7 +223,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const dislikeQuestion = async (id: string) => {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
     if (!token) return { error: 'Unauthorized. Please log in.' };
-
     try {
       const res = await fetch(`http://localhost:5500/questions/dislike/${id}`, {
         method: 'PATCH',
@@ -244,7 +230,6 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
           Authorization: `Bearer ${token}`,
         },
       });
-
       const data = await res.json();
       if (!res.ok) return { error: data.error || 'Failed to dislike question.' };
       return { updatedQuestion: data };

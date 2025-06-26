@@ -21,15 +21,7 @@ const App = () => {
         <Route index element={<Home />} />
         <Route path="questions" element={<Questions />} />
         <Route path="questions/:id" element={<SpecificQuestion />} />
-        
-        <Route
-          path="ask"
-          element={
-            <ProtectedRoute>
-              <AskQuestion />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="ask" element={<AskQuestion />} />
         
         <Route
           path="questions/:id/edit"

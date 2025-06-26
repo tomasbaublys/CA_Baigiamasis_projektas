@@ -119,8 +119,6 @@ const QuestionFilter = () => {
         </Select>
       </FieldBlock>
 
-      {/* TODO: Add tags field here when you are ready */}
-
       <div style={{ display: 'flex', gap: '1rem' }}>
         <Button type="submit">Apply filter</Button>
         <Button type="button" onClick={handleReset}>Reset</Button>

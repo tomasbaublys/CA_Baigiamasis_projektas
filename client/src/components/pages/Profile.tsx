@@ -12,8 +12,6 @@ const PageWrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #181818;
-  min-height: 100vh;
   padding: 3rem 1rem;
   color: #fff;
 `;
@@ -290,12 +288,12 @@ const Profile = () => {
               inputType="url"
               inputName="profilePicture"
               inputId="profilePicture"
-              inputValue={formik.values.profilePicture}
+              inputValue={''}
               inputOnChange={formik.handleChange}
               inputOnBlur={formik.handleBlur}
               errors={formik.errors.profilePicture}
               touched={formik.touched.profilePicture}
-              inputPlaceholder="https://example.com/avatar.jpg"
+              inputPlaceholder="https://example.com/avatar.jp"
             />
           </StyledFieldWrapper>
 
