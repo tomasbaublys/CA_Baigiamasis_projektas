@@ -90,7 +90,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
       filters.push(`filter_title=${encodeURIComponent(values.title)}`);
     }
     values.tags?.forEach(tag => {
-      filters.push(`filter_tag=${encodeURIComponent(tag)}`);
+      filters.push(`filter_tags=${encodeURIComponent(tag)}`);
     });
     if (values.isAnswered === true) {
       filters.push(`filter_isAnswered=true`);

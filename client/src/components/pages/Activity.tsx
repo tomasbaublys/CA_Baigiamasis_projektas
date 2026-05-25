@@ -6,6 +6,7 @@ import UsersContext from '../../components/contexts/UsersContext.tsx';
 import type { Question } from '../../types';
 import Person from '@mui/icons-material/Person';
 import QuestionAnswer from '@mui/icons-material/QuestionAnswer';
+import TagList from '../UI/molecules/TagList';
 
 const PageWrapper = styled.div`
   max-width: 1200px;
@@ -106,6 +107,7 @@ const Activity = () => {
                 <Link to={`/questions/${question._id}`}>{question.title}</Link>
               </QuestionTitle>
               <Description>{question.description}</Description>
+              <TagList tags={question.tags} />
               <Meta>
                 <Author>
                   <Person fontSize="small" />

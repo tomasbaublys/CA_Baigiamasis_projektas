@@ -8,6 +8,7 @@ import QuestionsPagination from '../UI/molecules/QuestionsPagination';
 import type { Question } from '../../types';
 import Person from '@mui/icons-material/Person';
 import QuestionAnswer from '@mui/icons-material/QuestionAnswer';
+import TagList from '../UI/molecules/TagList';
 
 const PageWrapper = styled.div`
   max-width: 1200px;
@@ -110,20 +111,44 @@ const Message = styled.p`
   font-size: 1rem;
 `;
 
+const getFiltersFromSearch = (search: string) => {
+  const params = new URLSearchParams(search);
+  const answered = params.get('answered');
+
+  return {
+    title: params.get('title') || undefined,
+    tags: params.getAll('tag'),
+    isAnswered: answered === null ? undefined : answered === 'true',
+  };
+};
+
 const Questions = () => {
   const location = useLocation();
-  const { questions, loading, fetchQuestions, filteredDataAmount } = useContext(QuestionsContext)!;
+  const {
+    questions,
+    loading,
+    applyFilter,
+    resetFilters,
+    filteredDataAmount,
+  } = useContext(QuestionsContext)!;
+  const activeTags = new URLSearchParams(location.search).getAll('tag');
 
   useEffect(() => {
     if (location.pathname === '/questions') {
-      fetchQuestions();
+      if (location.search) {
+        applyFilter(getFiltersFromSearch(location.search));
+      } else {
+        resetFilters();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.pathname]);
+  }, [location.pathname, location.search]);
 
   return (
     <PageWrapper>
-      <Title>All Questions ({filteredDataAmount})</Title>
+      <Title>
+        {activeTags.length ? `Questions tagged "${activeTags.join(', ')}"` : 'All Questions'} ({filteredDataAmount})
+      </Title>
       <PageLayout>
         <Sidebar>
           <h3>Filter</h3>
@@ -145,6 +170,7 @@ const Questions = () => {
                       <Link to={`/questions/${question._id}`}>{question.title}</Link>
                     </QuestionTitle>
                     <Description>{question.description}</Description>
+                    <TagList tags={question.tags} />
                     <Meta>
                       <Author>
                         <Person fontSize="small" />

@@ -11,6 +11,7 @@ import AnswersContext from '../contexts/AnswersContext';
 
 import AddAnswer from '../UI/organisms/AddAnswer';
 import AnswerCard from '../UI/molecules/AnswerCard';
+import TagList from '../UI/molecules/TagList';
 
 const Wrapper = styled.div`
   padding: 2rem 1rem;
@@ -291,6 +292,7 @@ const SpecificQuestion = () => {
               </span>
             )}
           </Meta>
+          <TagList tags={question.tags} />
           <Body>{question.description}</Body>
 
           {decodedUser && question.author && decodedUser._id === question.author._id && (

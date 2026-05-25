@@ -1,8 +1,11 @@
 import { useFormik } from 'formik';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router';
 import styled from 'styled-components';
 import QuestionsContext from '../../contexts/QuestionsContext';
 import { QuestionsFilterValues } from '../../../types';
+import TagList from './TagList';
+import { formatTags, parseTags } from '../../../utils/tagHelpers';
 
 const Form = styled.form`
   display: flex;
@@ -51,7 +54,10 @@ const Button = styled.button`
 `;
 
 const QuestionFilter = () => {
-  const { applyFilter, resetFilters } = useContext(QuestionsContext)!;
+  const { resetFilters } = useContext(QuestionsContext)!;
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [tagsInput, setTagsInput] = useState('');
 
   const formik = useFormik<QuestionsFilterValues>({
     initialValues: {
@@ -60,25 +66,43 @@ const QuestionFilter = () => {
       tags: [],
     },
     onSubmit(values) {
-      const filter: QuestionsFilterValues = {};
+      const nextParams = new URLSearchParams();
+      const tags = parseTags(tagsInput);
 
       if (values.isAnswered !== undefined) {
-        filter.isAnswered = values.isAnswered;
+        nextParams.set('answered', String(values.isAnswered));
       }
       if (values.title?.trim()) {
-        filter.title = values.title.trim();
+        nextParams.set('title', values.title.trim());
       }
-      if (values.tags?.length) {
-        filter.tags = values.tags;
-      }
+      tags.forEach((tag) => nextParams.append('tag', tag));
 
-      applyFilter(filter);
+      navigate({
+        pathname: '/questions',
+        search: nextParams.toString(),
+      });
     },
   });
 
+  useEffect(() => {
+    const tags = searchParams.getAll('tag');
+    const title = searchParams.get('title') || '';
+    const answered = searchParams.get('answered');
+
+    formik.setValues({
+      title,
+      tags,
+      isAnswered: answered === null ? undefined : answered === 'true',
+    });
+    setTagsInput(formatTags(tags));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
+
   const handleReset = () => {
     formik.resetForm();
+    setTagsInput('');
     resetFilters();
+    navigate('/questions');
   };
 
   return (
@@ -117,6 +141,21 @@ const QuestionFilter = () => {
           <option value="true">Only answered</option>
           <option value="false">Only unanswered</option>
         </Select>
+      </FieldBlock>
+
+      <FieldBlock>
+        <Label htmlFor="tags">Filter by tags:</Label>
+        <Input
+          type="text"
+          name="tags"
+          value={tagsInput}
+          onChange={(e) => {
+            setTagsInput(e.target.value);
+            formik.setFieldValue('tags', parseTags(e.target.value));
+          }}
+          placeholder="react, hooks"
+        />
+        <TagList tags={formik.values.tags} linkTags={false} />
       </FieldBlock>
 
       <div style={{ display: 'flex', gap: '1rem' }}>
