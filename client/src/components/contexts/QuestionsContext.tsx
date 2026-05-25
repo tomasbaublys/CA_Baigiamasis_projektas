@@ -30,7 +30,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const filterQueryRef = useRef('');
   const sortQueryRef = useRef('');
   const currentPageRef = useRef(1);
-  const pageSizeRef = useRef(10);
+  const pageSizeRef = useRef(25);
 
   const fetchQuestions = async (): Promise<void> => {
     setLoading(true);
@@ -90,7 +90,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
       filters.push(`filter_title=${encodeURIComponent(values.title)}`);
     }
     values.tags?.forEach(tag => {
-      filters.push(`filter_tag=${encodeURIComponent(tag)}`);
+      filters.push(`filter_tags=${encodeURIComponent(tag)}`);
     });
     if (values.isAnswered === true) {
       filters.push(`filter_isAnswered=true`);
@@ -118,6 +118,7 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   const resetFilters = () => {
     filterQueryRef.current = '';
     currentPageRef.current = 1;
+    getFilteredDataAmount();
     fetchQuestions();
   };
 
@@ -240,8 +241,10 @@ const QuestionsProvider = ({ children }: ChildrenProp) => {
   };
 
   useEffect(() => {
-    fetchQuestions();
-    getFilteredDataAmount();
+    const initFetch = async () => {
+      await Promise.all([getFilteredDataAmount(), fetchQuestions()]);
+    };
+    initFetch();
   }, []);
 
   return (

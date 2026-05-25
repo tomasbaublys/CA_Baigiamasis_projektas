@@ -148,13 +148,10 @@ const deleteAnswer = async (req, res) => {
       return res.status(403).send({ error: 'You are not allowed to delete this answer.' });
     }
 
-    // Delete the answer
     await answers.deleteOne({ _id: answerId });
 
-    // Check if any answers remain for the same question
     const remainingAnswersCount = await answers.countDocuments({ questionId: answer.questionId });
 
-    // If no more answers, update isAnswered to false
     if (remainingAnswersCount === 0) {
       await questions.updateOne(
         { _id: answer.questionId },

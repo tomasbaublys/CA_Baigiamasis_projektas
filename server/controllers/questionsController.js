@@ -1,7 +1,14 @@
 import { v4 as generateID, validate as uuidValidate } from 'uuid';
 import { connectDB, dynamicQuery, addCountToDocuments } from './helper.js';
 
-// CREATE QUESTION
+const normalizeTags = (tags = []) => {
+  return [...new Set(tags.map(tag => tag.trim().toLowerCase()).filter(Boolean))];
+};
+
+const tagsAreValid = (tags) => {
+  return Array.isArray(tags) && tags.length > 0 && tags.every(tag => /^[a-zA-Z0-9-]+$/.test(tag));
+};
+
 const createQuestion = async (req, res) => {
   const { title, description, tags, author } = req.body;
 
@@ -29,9 +36,11 @@ const createQuestion = async (req, res) => {
     return res.status(400).send({ error: 'Description must not exceed 5000 characters.' });
   }
 
-  if (tags && !Array.isArray(tags)) {
-    return res.status(400).send({ error: 'Tags must be an array.' });
+  if (!tagsAreValid(tags)) {
+    return res.status(400).send({ error: 'At least one valid tag is required.' });
   }
+
+  const normalizedTags = normalizeTags(tags);
 
   const client = await connectDB();
   try {
@@ -44,7 +53,7 @@ const createQuestion = async (req, res) => {
       _id: generateID(),
       title: title.trim(),
       description: description.trim(),
-      tags: tags ? tags.map(t => t.trim()) : [],
+      tags: normalizedTags,
       author: {
         _id: user._id,
         username: user.username,
@@ -69,7 +78,6 @@ const createQuestion = async (req, res) => {
   }
 };
 
-// GET ALL QUESTIONS
 const getAllQuestions = async (req, res) => {
   const client = await connectDB();
   try {
@@ -84,7 +92,6 @@ const getAllQuestions = async (req, res) => {
       .limit(settings.limit)
       .toArray();
 
-    // Add answersCount
     const dataWithCount = await addCountToDocuments(client, {
       dbName: 'Forum',
       sourceDocs: data,
@@ -93,7 +100,6 @@ const getAllQuestions = async (req, res) => {
       countFieldName: 'answersCount'
     });
 
-    // Add score field to each question
     const dataWithScores = dataWithCount.map(q => ({
       ...q,
       score: (q.likes?.length || 0) - (q.dislikes?.length || 0)
@@ -111,7 +117,6 @@ const getAllQuestions = async (req, res) => {
 const getQuestionById = async (req, res) => {
   const { id } = req.params;
 
-  // Validate ID format
   if (!uuidValidate(id)) {
     return res.status(400).send({ error: `Invalid question ID format: ${id}` });
   }
@@ -166,10 +171,10 @@ const updateQuestion = async (req, res) => {
   }
 
   if (tags) {
-    if (!Array.isArray(tags)) {
-      return res.status(400).send({ error: 'Tags must be an array.' });
+    if (!tagsAreValid(tags)) {
+      return res.status(400).send({ error: 'At least one valid tag is required.' });
     }
-    updates.tags = tags.map(t => t.trim()).filter(Boolean);
+    updates.tags = normalizeTags(tags);
   }
 
   if (!Object.keys(updates).length) {
@@ -185,6 +190,10 @@ const updateQuestion = async (req, res) => {
     const existing = await questions.findOne({ _id: id });
     if (!existing) {
       return res.status(404).send({ error: 'Question not found.' });
+    }
+
+    if (existing.author._id !== req.user._id) {
+      return res.status(403).send({ error: 'You do not have permission to edit this question.' });
     }
 
     await questions.updateOne({ _id: id }, { $set: updates });
@@ -267,10 +276,10 @@ const likeQuestion = async (req, res) => {
     const dislikes = new Set(question.dislikes || []);
 
     if (likes.has(userId)) {
-      likes.delete(userId); // remove like
+      likes.delete(userId);
     } else {
       likes.add(userId);
-      dislikes.delete(userId); // remove dislike if exists
+      dislikes.delete(userId);
     }
 
     await questions.updateOne(
@@ -309,10 +318,10 @@ const dislikeQuestion = async (req, res) => {
     const dislikes = new Set(question.dislikes || []);
 
     if (dislikes.has(userId)) {
-      dislikes.delete(userId); // remove dislike
+      dislikes.delete(userId);
     } else {
       dislikes.add(userId);
-      likes.delete(userId); // remove like if exists
+      likes.delete(userId);
     }
 
     await questions.updateOne(

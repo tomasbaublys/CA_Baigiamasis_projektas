@@ -4,7 +4,7 @@ import 'dotenv/config';
 
 import usersRoutes from './routes/usersRoutes.js';
 import questionsRoutes from './routes/questionsRoutes.js';
-import answersRoutes from './routes/answersRoutes.js'; // ✅
+import answersRoutes from './routes/answersRoutes.js'; 
 
 const PORT = process.env.PORT || 5501;
 

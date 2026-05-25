@@ -11,6 +11,7 @@ import EditQuestion from "./components/pages/EditQuestion";
 import NotFound from "./components/pages/NotFound";
 import ProtectedRoute from "./components/routes/ProtectedRoute";
 import PublicRoute from "./components/routes/PublicRoute";
+import Activity from "./components/pages/Activity";
 
 
 const App = () => {
@@ -40,7 +41,8 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
+        
+        <Route path="activity" element={<Activity />} />
         <Route path="login" element={<PublicRoute><Login /></PublicRoute>} />
         <Route path="register" element={<PublicRoute><Register /></PublicRoute>} />
         <Route path="*" element={<NotFound />} />

@@ -9,6 +9,8 @@ import UsersContext from '../contexts/UsersContext.tsx';
 
 import { QuestionsContextTypes, UsersContextTypes } from '../../types.ts';
 import InputField from '../../components/UI/molecules/InputField.tsx';
+import TagList from '../UI/molecules/TagList.tsx';
+import { formatTags, parseTags, tagsInputPattern } from '../../utils/tagHelpers.ts';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -93,6 +95,12 @@ const SubmitButton = styled.button`
   }
 `;
 
+const HelperText = styled.p`
+  margin: -8px 0 0;
+  font-size: 11px;
+  color: #999;
+`;
+
 const EditQuestion = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -116,7 +124,7 @@ const EditQuestion = () => {
         setInitialValues({
           title: questionData.title,
           description: questionData.description,
-          tags: questionData.tags.join(', '),
+          tags: formatTags(questionData.tags),
         });
       }
     };
@@ -128,17 +136,28 @@ const EditQuestion = () => {
     enableReinitialize: true,
     initialValues,
     validationSchema: Yup.object({
-      title: Yup.string().required('Required'),
-      description: Yup.string().required('Required'),
-      tags: Yup.string().required('Required'),
+      title: Yup.string()
+        .required('Title is required.')
+        .min(5, 'Minimum 5 characters.')
+        .max(120, 'Maximum 120 characters.')
+        .trim(),
+      description: Yup.string()
+        .required('Description is required.')
+        .min(30, 'Minimum 30 characters.')
+        .max(5000, 'Maximum 5000 characters.')
+        .trim(),
+      tags: Yup.string()
+        .required('At least one tag is required.')
+        .matches(tagsInputPattern, 'Tags must be comma-separated words.')
+        .trim(),
     }),
     onSubmit: async (values) => {
       if (!id || !loggedInUser) return;
 
       const updated = {
-        title: values.title,
-        description: values.description,
-        tags: values.tags.split(',').map((tag) => tag.trim()),
+        title: values.title.trim(),
+        description: values.description.trim(),
+        tags: parseTags(values.tags),
       };
 
       const res = await editQuestion(id, updated);
@@ -196,6 +215,9 @@ const EditQuestion = () => {
               inputOnBlur={formik.handleBlur}
             />
           </StyledFieldWrapper>
+
+          <HelperText>Tags are saved lowercase. Separate multiple tags with commas.</HelperText>
+          <TagList tags={parseTags(formik.values.tags)} linkTags={false} />
 
           <SubmitButton type="submit">Update Question</SubmitButton>
         </StyledForm>

@@ -8,6 +8,8 @@ import InputField from '../UI/molecules/InputField';
 import UsersContext from '../contexts/UsersContext';
 import QuestionsContext from '../contexts/QuestionsContext';
 import { UsersContextTypes, QuestionsContextTypes } from '../../types';
+import TagList from '../UI/molecules/TagList';
+import { parseTags, tagsInputPattern } from '../../utils/tagHelpers';
 
 const PageWrapper = styled.div`
   display: flex;
@@ -99,6 +101,12 @@ const FooterText = styled.p`
   text-align: center;
 `;
 
+const HelperText = styled.p`
+  margin: -8px 0 0;
+  font-size: 11px;
+  color: #999;
+`;
+
 const AskQuestion = () => {
   const navigate = useNavigate();
   const { loggedInUser } = useContext(UsersContext) as UsersContextTypes;
@@ -126,7 +134,7 @@ const AskQuestion = () => {
 
     tags: Yup.string()
       .required('At least one tag is required.')
-      .matches(/^([a-zA-Z0-9]+,?\s*)+$/, 'Tags must be comma-separated words.')
+      .matches(tagsInputPattern, 'Tags must be comma-separated words.')
       .trim()
   });
 
@@ -142,7 +150,7 @@ const AskQuestion = () => {
       const response = await createQuestion({
         title: values.title.trim(),
         description: values.description.trim(),
-        tags: values.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        tags: parseTags(values.tags),
         author: {
           _id: loggedInUser._id,
           username: loggedInUser.username,
@@ -209,6 +217,9 @@ const AskQuestion = () => {
               inputPlaceholder="e.g., react, hooks, formik"
             />
           </StyledFieldWrapper>
+
+          <HelperText>Tags are saved lowercase. Separate multiple tags with commas.</HelperText>
+          <TagList tags={parseTags(formik.values.tags)} linkTags={false} />
 
           <SubmitButton type="submit">Post Question</SubmitButton>
         </StyledForm>
